@@ -1,9 +1,12 @@
 import { Client } from 'discord.js';
+import * as dotenv from 'dotenv';
 import SarveBot from './SarveBot';
 
 const client = new Client();
 
-client.login('Nzg4MTg4MDM2NzQzNTYxMjI2.X9f3Tw.Ilj9TGnRWmNkLnouwiKiaOUNhQU')
+dotenv.config();
+
+client.login(process.env.BOT_TOKEN)
   .then(() => {
     new SarveBot(client);
   })
