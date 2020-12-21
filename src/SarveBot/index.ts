@@ -31,7 +31,9 @@ export default class SarveBot {
             message.channel.send('Failed to play song!');
           }
           break;
-
+        case 'sarve skip':
+          this.player.skipSong(message);
+          break;
         default:
           if(message.content.startsWith(this.PREFIX)) {
             message.channel.send('Invalid command');
