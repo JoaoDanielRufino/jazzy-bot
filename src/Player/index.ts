@@ -29,7 +29,7 @@ export default class Player {
     if(index >= playlist.length)
         return;
 
-    this.dispatcher = this.connection?.play(ytdl(playlist[index].url, { filter: 'audioonly' }));
+    this.dispatcher = this.connection?.play(ytdl(playlist[index].url, { filter: 'audioonly', quality: 'highestaudio' }));
     this.dispatcher?.on('start', () => {
       this.playing = true;
       this.message?.channel.send(`Now playing: ${playlist[index].title}`);
