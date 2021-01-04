@@ -3,7 +3,12 @@ import ytdl from 'ytdl-core';
 import memesPlaylist from '../playlists/memes.json';
 import sambasPlaylist from '../playlists/sambas.json';
 
-type Playlist = Array<{url: string, title: string}>;
+interface SongInfo {
+  url: string;
+  title: string;
+}
+
+type Playlist = Array<SongInfo>;
 
 export default class Player {
   private playing: boolean;
@@ -25,7 +30,24 @@ export default class Player {
     return arr;
   }
 
-  private play(playlist: Playlist, index: number) {
+  private randomIndex(arr: Playlist): number {
+    return Math.floor(Math.random() * arr.length);
+  }
+
+  private playSingleSong(song: SongInfo) {
+    this.dispatcher = this.connection?.play(ytdl(song.url, { filter: 'audioonly', quality: 'highestaudio' }));
+    this.dispatcher?.on('start', () => {
+      this.playing = true;
+      this.message?.channel.send(`Now playing: ${song.title}`);
+      console.log(`Started playing: ${song.title}`);
+    });
+    this.dispatcher?.on('finish', () => {
+      console.log('Finished playing song');
+      this.playing = false;
+    });
+  }
+
+  private playPlaylist(playlist: Playlist, index: number) {
     if(index >= playlist.length)
         return;
 
@@ -38,8 +60,17 @@ export default class Player {
     this.dispatcher?.on('finish', () => {
       console.log('Finished playing song');
       this.playing = false;
-      this.play(playlist, index+1);
+      this.playPlaylist(playlist, index+1);
     });
+  }
+
+  public playMeme(connection: VoiceConnection, message: Message) {
+    const index = this.randomIndex(this.memes);
+    
+    this.connection = connection;
+    this.message = message;
+
+    this.playSingleSong(this.memes[index]);
   }
 
   public playMemesPlaylist(connection: VoiceConnection, message: Message) {
@@ -48,7 +79,7 @@ export default class Player {
     this.connection = connection;
     this.message = message;
 
-    this.play(this.memes, 0);
+    this.playPlaylist(this.memes, 0);
   }
 
   public playSambaPlaylist(connection: VoiceConnection, message: Message) {
@@ -57,7 +88,7 @@ export default class Player {
     this.connection = connection;
     this.message = message;
 
-    this.play(this.sambas, 0);
+    this.playPlaylist(this.sambas, 0);
   }
 
   public skipSong(message: Message) {

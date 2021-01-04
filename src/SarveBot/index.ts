@@ -20,6 +20,17 @@ export default class SarveBot {
     this.client.on('message', async message => {
       let voiceChannel = message.member?.voice.channel;
       switch(message.content) {
+        case 'sarve meme':
+          if(!voiceChannel)
+            return message.channel.send('You need to be in a voice channel to play songs!');
+          try {
+            const connection = await voiceChannel.join();
+            this.player.playMeme(connection, message);
+          } catch(err) {
+            console.log(err);
+            message.channel.send('Failed to play song!');
+          }
+          break;
         case 'sarve meme playlist':
           if(!voiceChannel)
             return message.channel.send('You need to be in a voice channel to play songs!');
