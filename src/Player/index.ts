@@ -88,4 +88,9 @@ export default class Player {
       this.playing = true;
     }
   }
+
+  public reset() {
+    this.playing = false;
+    this.dispatcher?.destroy();
+  }
 }

@@ -52,6 +52,10 @@ export default class SarveBot {
         case 'sarve resume':
           this.player.resumeSong(message);
           break;
+        case 'sarve leave':
+          voiceChannel?.leave();
+          this.player.reset();
+          break;
         default:
           if(message.content.startsWith(this.PREFIX)) {
             message.channel.send('Invalid command');
