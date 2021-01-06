@@ -31,7 +31,7 @@ export default class SarveBot {
             message.channel.send('Failed to play song!');
           }
           break;
-        case 'sarve meme playlist':
+        case 'sarve memes':
           if(!voiceChannel)
             return message.channel.send('You need to be in a voice channel to play songs!');
           try {
@@ -42,7 +42,7 @@ export default class SarveBot {
             message.channel.send('Failed to play song!');
           }
           break;
-        case 'sarve samba playlist':
+        case 'sarve sambas':
           voiceChannel = message.member?.voice.channel;
           if(!voiceChannel)
             return message.channel.send('You need to be in a voice channel to play songs!');
