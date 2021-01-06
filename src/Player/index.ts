@@ -82,6 +82,15 @@ export default class Player {
     this.playPlaylist(this.memes, 0);
   }
 
+  public playSamba(connection: VoiceConnection, message: Message) {
+    const index = this.randomIndex(this.sambas);
+    
+    this.connection = connection;
+    this.message = message;
+
+    this.playSingleSong(this.sambas[index]);
+  }
+
   public playSambaPlaylist(connection: VoiceConnection, message: Message) {
     this.sambas = this.shuffle(this.sambas);
 
