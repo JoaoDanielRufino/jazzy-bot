@@ -44,12 +44,15 @@ export default class Player {
     this.dispatcher?.on('finish', () => {
       console.log('Finished playing song');
       this.playing = false;
+      setTimeout(() => this.connection?.disconnect(), 180000); // 3 min
     });
   }
 
   private playPlaylist(playlist: Playlist, index: number) {
-    if(index >= playlist.length)
-        return;
+    if(index >= playlist.length) {
+      setTimeout(() => this.connection?.disconnect(), 180000); // 3 min
+      return;
+    }
 
     this.dispatcher = this.connection?.play(ytdl(playlist[index].url, { filter: 'audioonly', quality: 'highestaudio' }));
     this.dispatcher?.on('start', () => {
