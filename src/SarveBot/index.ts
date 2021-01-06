@@ -42,18 +42,18 @@ export default class SarveBot {
             message.channel.send('Failed to play song!');
           }
           break;
-          case 'sarve samba':
-            voiceChannel = message.member?.voice.channel;
-            if(!voiceChannel)
-              return message.channel.send('You need to be in a voice channel to play songs!');
-            try {
-              const connection = await voiceChannel.join();
-              this.player.playSamba(connection, message);
-            } catch(err) {
-              console.log(err);
-              message.channel.send('Failed to play song!');
-            }
-            break;
+        case 'sarve samba':
+          voiceChannel = message.member?.voice.channel;
+          if(!voiceChannel)
+            return message.channel.send('You need to be in a voice channel to play songs!');
+          try {
+            const connection = await voiceChannel.join();
+            this.player.playSamba(connection, message);
+          } catch(err) {
+            console.log(err);
+            message.channel.send('Failed to play song!');
+          }
+          break;
         case 'sarve sambas':
           voiceChannel = message.member?.voice.channel;
           if(!voiceChannel)
