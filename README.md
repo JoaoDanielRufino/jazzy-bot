@@ -23,4 +23,8 @@ yarn start:local
 `sarve meme`: plays a random meme\
 `sarve memes`: plays the meme playlist\
 `sarve samba`: plays a random samba\
-`sarve sambas`: plays the samba playlist
+`sarve sambas`: plays the samba playlist\
+`sarve skip`: skip the current song\
+`sarve pause`: pause the current song\
+`sarve resume`: resume the current song\
+`sarve leave`: disconect the bot from the channel
