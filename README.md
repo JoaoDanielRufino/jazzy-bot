@@ -19,7 +19,7 @@ yarn start:local
 ```
 
 ## Commands
-`sarve meme`: plays a random meme
-`sarve memes`: plays the meme playlist
-`sarve samba`: plays a random samba
+`sarve meme`: plays a random meme\
+`sarve memes`: plays the meme playlist\
+`sarve samba`: plays a random samba\
 `sarve sambas`: plays the samba playlist
