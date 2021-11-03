@@ -64,8 +64,8 @@ export default class SarveBot {
           } catch(err) {
             console.log(err);
             message.channel.send('Failed to play song!');
-          }
-          break;
+					}
+					break;
         case 'sarve skip':
           this.player.skipSong(message);
           break;
@@ -81,7 +81,16 @@ export default class SarveBot {
           break;
         default:
           if(message.content.startsWith(this.PREFIX)) {
-            message.channel.send('Invalid command');
+						voiceChannel = message.member?.voice.channel;
+						if(!voiceChannel)
+							return message.channel.send('You need to be in a voice channel to play songs!');
+						try {
+							const connection = await voiceChannel.join();
+							await this.player.playYouTube(connection, message, message.content.substr(this.PREFIX.length + 1))
+						} catch(err) {
+							console.log(err);
+							message.channel.send('Failed to play song!');
+						}
           }
       }
     });

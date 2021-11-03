@@ -1,5 +1,6 @@
-import { Message, StreamDispatcher, VoiceConnection } from 'discord.js';
+import {Message, StreamDispatcher, VoiceConnection} from 'discord.js';
 import ytdl from 'ytdl-core';
+import yts from 'yt-search'
 import memesPlaylist from '../playlists/memes.json';
 import sambasPlaylist from '../playlists/sambas.json';
 
@@ -44,13 +45,13 @@ export default class Player {
     this.dispatcher?.on('finish', () => {
       console.log('Finished playing song');
       this.playing = false;
-      setTimeout(() => this.connection?.disconnect(), 180000); // 3 min
+      // setTimeout(() => this.connection?.disconnect(), 180000); // 3 min
     });
   }
 
   private playPlaylist(playlist: Playlist, index: number) {
     if(index >= playlist.length) {
-      setTimeout(() => this.connection?.disconnect(), 180000); // 3 min
+      // setTimeout(() => this.connection?.disconnect(), 180000); // 3 min
       return;
     }
 
@@ -100,8 +101,19 @@ export default class Player {
     this.connection = connection;
     this.message = message;
 
-    this.playPlaylist(this.sambas, 0);
-  }
+		this.playPlaylist(this.sambas, 0);
+	}
+
+	public async playYouTube(connection: VoiceConnection, message: Message, query: string) {
+		this.connection = connection;
+		this.message = message;
+
+		const response = await yts(query);
+		const video = response.videos[0];
+		const song: SongInfo = video;
+
+		this.playSingleSong(song);
+	}
 
   public skipSong(message: Message) {
     if(!this.playing) {
