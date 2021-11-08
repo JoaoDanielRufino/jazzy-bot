@@ -6,6 +6,7 @@ import {
 } from '@discordjs/voice';
 import ytdl from 'ytdl-core';
 import sambasPlaylist from './playlists/sambas.json';
+import { randomIndex } from './utils';
 
 export class MusicPlayer {
   private connection?: VoiceConnection;
@@ -17,10 +18,9 @@ export class MusicPlayer {
   }
 
   public playSamba() {
+    const sambaIndex = randomIndex(this.sambas);
     this.audioPlayer.play(
-      createAudioResource(
-        ytdl(this.sambas[0].url, { filter: 'audioonly', quality: 'highestaudio' })
-      )
+      createAudioResource(ytdl(this.sambas[sambaIndex].url, { filter: 'audioonly', quality: 'highestaudio' }))
     );
   }
 
