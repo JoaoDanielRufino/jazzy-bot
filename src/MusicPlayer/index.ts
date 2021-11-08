@@ -8,7 +8,7 @@ import {
 } from '@discordjs/voice';
 import ytdl from 'ytdl-core';
 import sambasPlaylist from './playlists/sambas.json';
-import { randomIndex } from './utils';
+import { randomIndex, shuffle } from './utils';
 import { Queue } from './Queue';
 
 interface SongInfo {
@@ -21,12 +21,12 @@ export class MusicPlayer {
   private audioPlayer: AudioPlayer;
   private sambas: SongInfo[] = sambasPlaylist;
   private queue: Queue<SongInfo>;
-  private isPlaying: boolean;
+  private lockPushEvent: boolean;
 
   constructor() {
     this.audioPlayer = createAudioPlayer();
     this.queue = new Queue();
-    this.isPlaying = false;
+    this.lockPushEvent = false;
 
     this.queue.onPushEvent(this.handleQueuePush.bind(this));
     this.audioPlayer.on('stateChange', this.handleStateChange.bind(this));
@@ -35,8 +35,8 @@ export class MusicPlayer {
   private handleStateChange(oldState: AudioPlayerState, newState: AudioPlayerState) {
     console.log('OLD STATE', oldState.status);
     console.log('NEW STATE', newState.status);
-    if (newState.status === AudioPlayerStatus.Playing) this.isPlaying = true;
-    else if (newState.status === AudioPlayerStatus.Idle) this.isPlaying = false;
+    if (newState.status !== AudioPlayerStatus.Idle) this.lockPushEvent = true;
+    else this.lockPushEvent = false;
 
     if (
       oldState.status === AudioPlayerStatus.Playing &&
@@ -47,7 +47,7 @@ export class MusicPlayer {
   }
 
   private handleQueuePush() {
-    if (!this.isPlaying) this.processQueue();
+    if (!this.lockPushEvent) this.processQueue();
   }
 
   private processQueue() {
@@ -62,6 +62,16 @@ export class MusicPlayer {
   public playSamba() {
     const sambaIndex = randomIndex(this.sambas);
     this.queue.push(this.sambas[sambaIndex]);
+  }
+
+  public playSambaPlaylist() {
+    this.sambas = shuffle(this.sambas);
+    this.sambas.forEach((samba) => this.queue.push(samba));
+  }
+
+  public skipSong() {
+    this.audioPlayer.stop();
+    this.processQueue();
   }
 
   public setConnection(connection: VoiceConnection) {

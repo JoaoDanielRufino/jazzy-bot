@@ -24,6 +24,10 @@ export class Queue<T> {
     return this.queue[0];
   }
 
+  public size() {
+    return this.queue.length;
+  }
+
   public onPushEvent(cb: () => void) {
     this.onPushEventCallback = cb;
   }

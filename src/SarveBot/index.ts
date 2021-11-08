@@ -4,6 +4,8 @@ import { CommandChain } from '../Commands/CommandChain';
 import { PlaySambaCommand } from '../Commands/impl/PlaySambaCommand';
 import { EmptyCommand } from '../Commands/impl/EmptyCommand';
 import { MusicPlayer } from '../MusicPlayer';
+import { PlaySambaPlaylistCommand } from '../Commands/impl/PlaySambaPlaylistCommand';
+import { SkipCommand } from '../Commands/impl/SkipCommand';
 
 export default class SarveBot {
   private client: Client;
@@ -24,9 +26,13 @@ export default class SarveBot {
 
   private createCommands(): CommandChain {
     const sambaCommand = new PlaySambaCommand();
+    const sambaPlaylistCommand = new PlaySambaPlaylistCommand();
+    const skipCommand = new SkipCommand();
     const emptyCommand = new EmptyCommand();
 
-    sambaCommand.setNext(emptyCommand);
+    sambaCommand.setNext(sambaPlaylistCommand);
+    sambaPlaylistCommand.setNext(skipCommand);
+    skipCommand.setNext(emptyCommand);
 
     return sambaCommand;
   }
