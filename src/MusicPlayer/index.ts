@@ -20,7 +20,9 @@ export class MusicPlayer {
   public playSamba() {
     const sambaIndex = randomIndex(this.sambas);
     this.audioPlayer.play(
-      createAudioResource(ytdl(this.sambas[sambaIndex].url, { filter: 'audioonly', quality: 'highestaudio' }))
+      createAudioResource(
+        ytdl(this.sambas[sambaIndex].url, { filter: 'audioonly', quality: 'highestaudio' })
+      )
     );
   }
 
