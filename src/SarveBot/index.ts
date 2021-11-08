@@ -34,25 +34,24 @@ export default class SarveBot {
     return sambaCommand;
   }
 
+  private joinVoiceChannel() {
+    this.connection = joinVoiceChannel({
+      channelId: this.voiceChannel!.id,
+      guildId: this.voiceChannel!.guildId,
+      adapterCreator: this.voiceChannel!.guild.voiceAdapterCreator,
+    });
+  }
+
   private handleConnection(message: Message) {
     if (!this.voiceChannel || this.voiceChannel != message.member!.voice.channel) {
       this.voiceChannel = message.member!.voice.channel!;
-      this.connection = joinVoiceChannel({
-        channelId: this.voiceChannel.id,
-        guildId: this.voiceChannel.guildId,
-        adapterCreator: this.voiceChannel.guild.voiceAdapterCreator,
-      });
     }
 
     if (!this.connection) {
-      this.connection = joinVoiceChannel({
-        channelId: this.voiceChannel.id,
-        guildId: this.voiceChannel.guildId,
-        adapterCreator: this.voiceChannel.guild.voiceAdapterCreator,
-      });
+      this.joinVoiceChannel();
     }
 
-    this.musicPlayer.setConnection(this.connection);
+    this.musicPlayer.setConnection(this.connection!);
   }
 
   private async onMessageCreate(message: Message) {
