@@ -10,6 +10,7 @@ import ytdl from 'ytdl-core';
 import sambasPlaylist from './playlists/sambas.json';
 import { randomIndex, shuffle } from './utils';
 import { Queue } from './Queue';
+import { Message } from 'discord.js';
 
 interface SongInfo {
   url: string;
@@ -18,6 +19,7 @@ interface SongInfo {
 
 export class MusicPlayer {
   private connection?: VoiceConnection;
+  private message?: Message;
   private audioPlayer: AudioPlayer;
   private sambas: SongInfo[] = sambasPlaylist;
   private queue: Queue<SongInfo>;
@@ -54,9 +56,12 @@ export class MusicPlayer {
     if (this.queue.empty()) return;
 
     const nextSong = this.queue.pop()!;
+
     this.audioPlayer.play(
       createAudioResource(ytdl(nextSong.url, { filter: 'audioonly', quality: 'highestaudio' }))
     );
+
+    this.message?.channel.send(`Now playing: ${nextSong.title}`);
   }
 
   public playSamba() {
@@ -77,5 +82,9 @@ export class MusicPlayer {
   public setConnection(connection: VoiceConnection) {
     this.connection = connection;
     this.connection.subscribe(this.audioPlayer);
+  }
+
+  public setMessage(message: Message) {
+    this.message = message;
   }
 }

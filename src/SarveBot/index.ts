@@ -66,6 +66,7 @@ export default class SarveBot {
     }
 
     this.handleConnection(message);
+    this.musicPlayer.setMessage(message);
 
     const command = message.content.substr(this.PREFIX.length + 1);
     this.commandChain.processCommand(command, message, this.musicPlayer);
