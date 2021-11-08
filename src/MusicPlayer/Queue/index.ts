@@ -21,6 +21,8 @@ export class Queue<T> {
   }
 
   public top() {
+    if (this.empty()) return undefined;
+
     return this.queue[0];
   }
 
