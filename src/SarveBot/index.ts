@@ -15,13 +15,10 @@ export default class SarveBot {
 
   constructor(client: Client) {
     this.client = client;
-
     this.commandChain = this.createCommands();
-
     this.musicPlayer = new MusicPlayer();
 
     this.client.on('ready', () => console.log('Bot ready'));
-
     this.client.on('messageCreate', this.onMessageCreate.bind(this));
   }
 
