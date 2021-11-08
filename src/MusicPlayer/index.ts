@@ -1,5 +1,6 @@
 import {
   AudioPlayer,
+  AudioPlayerState,
   createAudioPlayer,
   createAudioResource,
   VoiceConnection,
@@ -15,6 +16,12 @@ export class MusicPlayer {
 
   constructor() {
     this.audioPlayer = createAudioPlayer();
+    this.audioPlayer.on('stateChange', this.handleStateChange.bind(this));
+  }
+
+  private handleStateChange(oldState: AudioPlayerState, newState: AudioPlayerState) {
+    console.log('OLD STATE', oldState.status);
+    console.log('NEW STATE', newState);
   }
 
   public playSamba() {
