@@ -18,6 +18,5 @@ export class SkipCommand implements CommandChain {
     if (command !== 'skip') return this.nextCommand.processCommand(command, message, musicPlayer);
 
     musicPlayer.skipSong();
-    await message.channel.send('Skipping song...');
   }
 }

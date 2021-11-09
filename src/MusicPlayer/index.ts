@@ -39,8 +39,7 @@ export class MusicPlayer {
   }
 
   private handleStateChange(oldState: AudioPlayerState, newState: AudioPlayerState) {
-    console.log('OLD STATE', oldState.status);
-    console.log('NEW STATE', newState.status);
+    console.log(`oldState: ${oldState.status} - newState: ${newState.status}`);
     if (newState.status !== AudioPlayerStatus.Idle) this.lockPushEvent = true;
     else this.lockPushEvent = false;
 
@@ -61,11 +60,19 @@ export class MusicPlayer {
 
     const nextSong = this.queue.pop()!;
 
-    this.audioPlayer.play(
-      createAudioResource(ytdl(nextSong.url, { filter: 'audioonly', quality: 'highestaudio' }))
-    );
+    try {
+      this.audioPlayer.play(
+        createAudioResource(ytdl(nextSong.url, { filter: 'audioonly', quality: 'highestaudio' }))
+      );
+      this.message?.channel.send(`Now playing: ${nextSong.title}`);
+    } catch (err) {
+      console.log(err);
+      this.message?.channel.send('Failed to play song');
+    }
+  }
 
-    this.message?.channel.send(`Now playing: ${nextSong.title}`);
+  public play(song: SongInfo) {
+    this.queue.push(song);
   }
 
   public playSamba() {
@@ -90,6 +97,7 @@ export class MusicPlayer {
 
   public skipSong() {
     this.audioPlayer.stop();
+    this.message?.channel.send('Skipping song...');
     this.processQueue();
   }
 
