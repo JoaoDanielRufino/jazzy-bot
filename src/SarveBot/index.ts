@@ -1,98 +1,84 @@
-import { Client } from 'discord.js';
-import Player from '../Player';
+import { Client, Message, StageChannel, VoiceChannel } from 'discord.js';
+import { joinVoiceChannel, VoiceConnection } from '@discordjs/voice';
+import { CommandChain } from '../Commands/CommandChain';
+import { PlaySambaCommand } from '../Commands/impl/PlaySambaCommand';
+import { EmptyCommand } from '../Commands/impl/EmptyCommand';
+import { MusicPlayer } from '../MusicPlayer';
+import { PlaySambaPlaylistCommand } from '../Commands/impl/PlaySambaPlaylistCommand';
+import { SkipCommand } from '../Commands/impl/SkipCommand';
+import { PlayMemeCommand } from '../Commands/impl/PlayMemeCommand';
+import { PlayMemesCommand } from '../Commands/impl/PlayMemesCommand';
+import { PlayCommand } from '../Commands/impl/PlayCommand';
 
 export default class SarveBot {
   private client: Client;
-  private player: Player;
   private readonly PREFIX = 'sarve';
+  private commandChain: CommandChain;
+  private voiceChannel?: VoiceChannel | StageChannel;
+  private connection?: VoiceConnection;
+  private musicPlayer: MusicPlayer;
 
   constructor(client: Client) {
     this.client = client;
-    this.player = new Player();
+    this.commandChain = this.createCommands();
+    this.musicPlayer = new MusicPlayer();
 
-    this.client.on('ready', () => {
-      console.log('Bot on');
-      this.listen();
+    this.client.on('ready', () => console.log('Bot ready'));
+    this.client.on('messageCreate', this.onMessageCreate.bind(this));
+  }
+
+  private createCommands(): CommandChain {
+    const sambaCommand = new PlaySambaCommand();
+    const sambaPlaylistCommand = new PlaySambaPlaylistCommand();
+    const memeCommand = new PlayMemeCommand();
+    const memesPlaylistCommand = new PlayMemesCommand();
+    const playCommand = new PlayCommand();
+    const skipCommand = new SkipCommand();
+    const emptyCommand = new EmptyCommand();
+
+    sambaCommand.setNext(sambaPlaylistCommand);
+    sambaPlaylistCommand.setNext(memeCommand);
+    memeCommand.setNext(memesPlaylistCommand);
+    memesPlaylistCommand.setNext(playCommand);
+    playCommand.setNext(skipCommand);
+    skipCommand.setNext(emptyCommand);
+
+    return sambaCommand;
+  }
+
+  private joinVoiceChannel() {
+    this.connection = joinVoiceChannel({
+      channelId: this.voiceChannel!.id,
+      guildId: this.voiceChannel!.guildId,
+      adapterCreator: this.voiceChannel!.guild.voiceAdapterCreator,
     });
   }
 
-  private listen() {
-    this.client.on('message', async message => {
-      let voiceChannel = message.member?.voice.channel;
-      switch(message.content) {
-        case 'sarve meme':
-          if(!voiceChannel)
-            return message.channel.send('You need to be in a voice channel to play songs!');
-          try {
-            const connection = await voiceChannel.join();
-            this.player.playMeme(connection, message);
-          } catch(err) {
-            console.log(err);
-            message.channel.send('Failed to play song!');
-          }
-          break;
-        case 'sarve memes':
-          if(!voiceChannel)
-            return message.channel.send('You need to be in a voice channel to play songs!');
-          try {
-            const connection = await voiceChannel.join();
-            this.player.playMemesPlaylist(connection, message);
-          } catch(err) {
-            console.log(err);
-            message.channel.send('Failed to play song!');
-          }
-          break;
-        case 'sarve samba':
-          voiceChannel = message.member?.voice.channel;
-          if(!voiceChannel)
-            return message.channel.send('You need to be in a voice channel to play songs!');
-          try {
-            const connection = await voiceChannel.join();
-            this.player.playSamba(connection, message);
-          } catch(err) {
-            console.log(err);
-            message.channel.send('Failed to play song!');
-          }
-          break;
-        case 'sarve sambas':
-          voiceChannel = message.member?.voice.channel;
-          if(!voiceChannel)
-            return message.channel.send('You need to be in a voice channel to play songs!');
-          try {
-            const connection = await voiceChannel.join();
-            this.player.playSambaPlaylist(connection, message);
-          } catch(err) {
-            console.log(err);
-            message.channel.send('Failed to play song!');
-					}
-					break;
-        case 'sarve skip':
-          this.player.skipSong(message);
-          break;
-        case 'sarve pause':
-          this.player.pauseSong(message);
-          break;
-        case 'sarve resume':
-          this.player.resumeSong(message);
-          break;
-        case 'sarve leave':
-          voiceChannel?.leave();
-          this.player.reset();
-          break;
-        default:
-          if(message.content.startsWith(this.PREFIX)) {
-						voiceChannel = message.member?.voice.channel;
-						if(!voiceChannel)
-							return message.channel.send('You need to be in a voice channel to play songs!');
-						try {
-							const connection = await voiceChannel.join();
-							await this.player.playYouTube(connection, message, message.content.substr(this.PREFIX.length + 1))
-						} catch(err) {
-							console.log(err);
-							message.channel.send('Failed to play song!');
-						}
-          }
-      }
-    });
+  private handleConnection(message: Message) {
+    if (!this.voiceChannel || this.voiceChannel != message.member!.voice.channel) {
+      this.voiceChannel = message.member!.voice.channel!;
+      this.joinVoiceChannel();
+    }
+
+    if (!this.connection) {
+      this.joinVoiceChannel();
+    }
+
+    this.musicPlayer.setConnection(this.connection!);
+  }
+
+  private async onMessageCreate(message: Message) {
+    if (!message.content.startsWith(this.PREFIX)) return;
+
+    if (!message.member?.voice.channel) {
+      await message.reply('You need to be in a voice channel to run a command');
+      return;
+    }
+
+    this.handleConnection(message);
+    this.musicPlayer.setMessage(message);
+
+    const command = message.content.substr(this.PREFIX.length + 1);
+    this.commandChain.processCommand(command, message, this.musicPlayer);
   }
 }
