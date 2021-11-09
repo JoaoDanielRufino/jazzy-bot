@@ -54,6 +54,7 @@ export default class SarveBot {
   private handleConnection(message: Message) {
     if (!this.voiceChannel || this.voiceChannel != message.member!.voice.channel) {
       this.voiceChannel = message.member!.voice.channel!;
+      this.joinVoiceChannel();
     }
 
     if (!this.connection) {
