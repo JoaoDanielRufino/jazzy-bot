@@ -8,6 +8,7 @@ import {
 } from '@discordjs/voice';
 import ytdl from 'ytdl-core';
 import sambasPlaylist from './playlists/sambas.json';
+import memesPlaylist from './playlists/memes.json';
 import { randomIndex, shuffle } from './utils';
 import { Queue } from './Queue';
 import { Message } from 'discord.js';
@@ -21,12 +22,15 @@ export class MusicPlayer {
   private connection?: VoiceConnection;
   private message?: Message;
   private audioPlayer: AudioPlayer;
-  private sambas: SongInfo[] = sambasPlaylist;
+  private sambas: SongInfo[];
+  private memes: SongInfo[];
   private queue: Queue<SongInfo>;
   private lockPushEvent: boolean;
 
   constructor() {
     this.audioPlayer = createAudioPlayer();
+    this.sambas = sambasPlaylist;
+    this.memes = memesPlaylist;
     this.queue = new Queue();
     this.lockPushEvent = false;
 
@@ -72,6 +76,16 @@ export class MusicPlayer {
   public playSambaPlaylist() {
     this.sambas = shuffle(this.sambas);
     this.sambas.forEach((samba) => this.queue.push(samba));
+  }
+
+  public playMeme() {
+    const memeIndex = randomIndex(this.memes);
+    this.queue.push(this.memes[memeIndex]);
+  }
+
+  public playMemes() {
+    this.memes = shuffle(this.memes);
+    this.memes.forEach((meme) => this.queue.push(meme));
   }
 
   public skipSong() {
