@@ -1,5 +1,6 @@
 import {
   AudioPlayer,
+  AudioPlayerError,
   AudioPlayerState,
   AudioPlayerStatus,
   createAudioPlayer,
@@ -37,7 +38,7 @@ export class MusicPlayer {
 
     this.queue.onPushEvent(this.handleQueuePush.bind(this));
     this.audioPlayer.on('stateChange', this.handleStateChange.bind(this));
-    this.audioPlayer.on('error', (err) => console.log(err));
+    this.audioPlayer.on('error', this.handleError.bind(this));
     this.connection.subscribe(this.audioPlayer);
   }
 
@@ -54,6 +55,11 @@ export class MusicPlayer {
     }
   }
 
+  private handleError(err: AudioPlayerError) {
+    console.log(err);
+    this.message?.channel.send('Failed to play song');
+  }
+
   private handleQueuePush() {
     if (!this.lockPushEvent) this.processQueue();
   }
@@ -63,15 +69,11 @@ export class MusicPlayer {
 
     const nextSong = this.queue.pop()!;
 
-    try {
-      this.audioPlayer.play(
-        createAudioResource(ytdl(nextSong.url, { filter: 'audioonly', quality: 'highestaudio' }))
-      );
-      this.message?.channel.send(`Now playing: ${nextSong.title}`);
-    } catch (err) {
-      console.log(err);
-      this.message?.channel.send('Failed to play song');
-    }
+    this.audioPlayer.play(
+      createAudioResource(ytdl(nextSong.url, { filter: 'audioonly', quality: 'highestaudio' }))
+    );
+
+    this.message?.channel.send(`Now playing: ${nextSong.title}`);
   }
 
   public play(song: SongInfo) {
