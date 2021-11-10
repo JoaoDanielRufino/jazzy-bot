@@ -18,6 +18,5 @@ export class PlaySambaCommand implements CommandChain {
     if (command !== 'samba') return this.nextCommand.processCommand(command, message, musicPlayer);
 
     musicPlayer.playSamba();
-    // await message.channel.send('Playing samba!');
   }
 }
