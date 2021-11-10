@@ -36,6 +36,7 @@ export class MusicPlayer {
 
     this.queue.onPushEvent(this.handleQueuePush.bind(this));
     this.audioPlayer.on('stateChange', this.handleStateChange.bind(this));
+    this.audioPlayer.on('error', (err) => console.log(err));
   }
 
   private handleStateChange(oldState: AudioPlayerState, newState: AudioPlayerState) {
