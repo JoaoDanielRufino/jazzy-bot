@@ -3,7 +3,7 @@ import { CommandChain } from '../CommandChain';
 import { EmptyCommand } from './EmptyCommand';
 import { MusicPlayer } from '../../MusicPlayer';
 
-export class PlaySambaPlaylistCommand implements CommandChain {
+export class PlaySambasCommand implements CommandChain {
   private nextCommand: CommandChain;
 
   constructor() {

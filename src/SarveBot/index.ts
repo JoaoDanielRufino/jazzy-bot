@@ -1,14 +1,16 @@
 import { Client, Message } from 'discord.js';
 import { joinVoiceChannel } from '@discordjs/voice';
-import { CommandChain } from '../Commands/CommandChain';
-import { PlaySambaCommand } from '../Commands/impl/PlaySambaCommand';
-import { EmptyCommand } from '../Commands/impl/EmptyCommand';
 import { MusicPlayer } from '../MusicPlayer';
-import { PlaySambaPlaylistCommand } from '../Commands/impl/PlaySambaPlaylistCommand';
-import { SkipCommand } from '../Commands/impl/SkipCommand';
-import { PlayMemeCommand } from '../Commands/impl/PlayMemeCommand';
-import { PlayMemesCommand } from '../Commands/impl/PlayMemesCommand';
-import { PlayCommand } from '../Commands/impl/PlayCommand';
+import { CommandChain } from '../Commands/CommandChain';
+import {
+  PlaySambaCommand,
+  PlaySambasCommand,
+  PlayMemeCommand,
+  PlayMemesCommand,
+  PlayCommand,
+  SkipCommand,
+  EmptyCommand,
+} from '../Commands/impl';
 
 export default class SarveBot {
   private client: Client;
@@ -27,7 +29,7 @@ export default class SarveBot {
 
   private createCommands(): CommandChain {
     const sambaCommand = new PlaySambaCommand();
-    const sambaPlaylistCommand = new PlaySambaPlaylistCommand();
+    const sambaPlaylistCommand = new PlaySambasCommand();
     const memeCommand = new PlayMemeCommand();
     const memesPlaylistCommand = new PlayMemesCommand();
     const playCommand = new PlayCommand();
