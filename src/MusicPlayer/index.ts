@@ -19,7 +19,7 @@ interface SongInfo {
 }
 
 export class MusicPlayer {
-  private connection?: VoiceConnection;
+  private connection: VoiceConnection;
   private message?: Message;
   private audioPlayer: AudioPlayer;
   private sambas: SongInfo[];
@@ -27,8 +27,9 @@ export class MusicPlayer {
   private queue: Queue<SongInfo>;
   private lockPushEvent: boolean;
 
-  constructor() {
+  constructor(connection: VoiceConnection) {
     this.audioPlayer = createAudioPlayer();
+    this.connection = connection;
     this.sambas = sambasPlaylist;
     this.memes = memesPlaylist;
     this.queue = new Queue();
@@ -37,6 +38,7 @@ export class MusicPlayer {
     this.queue.onPushEvent(this.handleQueuePush.bind(this));
     this.audioPlayer.on('stateChange', this.handleStateChange.bind(this));
     this.audioPlayer.on('error', (err) => console.log(err));
+    this.connection.subscribe(this.audioPlayer);
   }
 
   private handleStateChange(oldState: AudioPlayerState, newState: AudioPlayerState) {
@@ -100,11 +102,6 @@ export class MusicPlayer {
     this.audioPlayer.stop();
     this.message?.channel.send('Skipping song...');
     this.processQueue();
-  }
-
-  public setConnection(connection: VoiceConnection) {
-    this.connection = connection;
-    this.connection.subscribe(this.audioPlayer);
   }
 
   public setMessage(message: Message) {
