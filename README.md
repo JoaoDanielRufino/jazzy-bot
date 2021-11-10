@@ -10,21 +10,19 @@ In order to run the bot locally you need to clone this repo and perform the foll
 **npm**
 ```
 npm install
-npm run start:local
+npm run start
 ```
 
 **yarn**
 ```
 yarn
-yarn start:local
+yarn start
 ```
 
 ## Commands
+`sarve play [song name or youtube url]`: plays a song from youtube\
 `sarve meme`: plays a random meme\
 `sarve memes`: plays the meme playlist\
 `sarve samba`: plays a random samba\
 `sarve sambas`: plays the samba playlist\
-`sarve skip`: skip the current song\
-`sarve pause`: pause the current song\
-`sarve resume`: resume the current song\
-`sarve leave`: disconect the bot from the channel
+`sarve skip`: skip the current song
