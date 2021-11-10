@@ -58,6 +58,7 @@ export class MusicPlayer {
   private handleError(err: AudioPlayerError) {
     console.log(err);
     this.message?.channel.send('Failed to play song');
+    this.processQueue();
   }
 
   private handleQueuePush() {
