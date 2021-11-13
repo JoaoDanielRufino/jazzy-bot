@@ -1,5 +1,5 @@
-import { Client, Message } from 'discord.js';
-import { joinVoiceChannel } from '@discordjs/voice';
+import { Client, Message, StageChannel, VoiceChannel } from 'discord.js';
+import { joinVoiceChannel, VoiceConnectionStatus } from '@discordjs/voice';
 import { MusicPlayer } from '../MusicPlayer';
 import { CommandChain } from '../Commands/CommandChain';
 import {
@@ -46,6 +46,24 @@ export default class SarveBot {
     return sambaCommand;
   }
 
+  private createVoiceConnection(voiceChannel: VoiceChannel | StageChannel) {
+    const connection = joinVoiceChannel({
+      channelId: voiceChannel.id,
+      guildId: voiceChannel.guildId,
+      adapterCreator: voiceChannel.guild.voiceAdapterCreator,
+    });
+
+    connection.on('stateChange', (_, newState) => {
+      if (newState.status === VoiceConnectionStatus.Disconnected) {
+        this.subscriptions.get(voiceChannel.guildId)!.destroy();
+        this.subscriptions.delete(voiceChannel.guildId);
+        console.log(`Disconnected from ${voiceChannel.guildId}`);
+      }
+    });
+
+    return connection;
+  }
+
   private async onMessageCreate(message: Message) {
     if (!message.content.startsWith(this.PREFIX)) return;
 
@@ -60,13 +78,10 @@ export default class SarveBot {
       musicPlayer = this.subscriptions.get(guildId)!;
     } else {
       const voiceChannel = message.member!.voice.channel;
-      musicPlayer = new MusicPlayer(
-        joinVoiceChannel({
-          channelId: voiceChannel.id,
-          guildId: voiceChannel.guildId,
-          adapterCreator: voiceChannel.guild.voiceAdapterCreator,
-        })
-      );
+      const voiceConnection = this.createVoiceConnection(voiceChannel);
+
+      musicPlayer = new MusicPlayer(voiceConnection);
+
       this.subscriptions.set(guildId, musicPlayer);
     }
 

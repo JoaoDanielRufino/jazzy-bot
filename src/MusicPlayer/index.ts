@@ -74,6 +74,7 @@ export class MusicPlayer {
       createAudioResource(ytdl(nextSong.url, { filter: 'audioonly', quality: 'highestaudio' }))
     );
 
+    console.log(`Playing ${nextSong.title}`);
     this.message?.channel.send(`Now playing: ${nextSong.title}`);
   }
 
@@ -105,6 +106,10 @@ export class MusicPlayer {
     this.audioPlayer.stop();
     this.message?.channel.send('Skipping song...');
     this.processQueue();
+  }
+
+  public destroy() {
+    this.connection.destroy();
   }
 
   public setMessage(message: Message) {
