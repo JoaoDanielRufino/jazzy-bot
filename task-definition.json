@@ -1,0 +1,68 @@
+{
+    "taskDefinitionArn": "arn:aws:ecs:us-east-1:347857632042:task-definition/sarve-bot-task-definition:1",
+    "containerDefinitions": [
+        {
+            "name": "sarve-bot",
+            "image": "347857632042.dkr.ecr.us-east-1.amazonaws.com/sarve-bot:v1",
+            "cpu": 0,
+            "portMappings": [],
+            "essential": true,
+            "environment": [],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/sarve-bot-task-definition",
+                    "awslogs-region": "us-east-1",
+                    "awslogs-stream-prefix": "ecs"
+                }
+            }
+        }
+    ],
+    "family": "sarve-bot-task-definition",
+    "taskRoleArn": "arn:aws:iam::347857632042:role/ecsTaskExecutionRole",
+    "executionRoleArn": "arn:aws:iam::347857632042:role/ecsTaskExecutionRole",
+    "networkMode": "awsvpc",
+    "revision": 1,
+    "volumes": [],
+    "status": "ACTIVE",
+    "requiresAttributes": [
+        {
+            "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
+        },
+        {
+            "name": "ecs.capability.execution-role-awslogs"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.ecr-auth"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.task-iam-role"
+        },
+        {
+            "name": "ecs.capability.execution-role-ecr-pull"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
+        },
+        {
+            "name": "ecs.capability.task-eni"
+        }
+    ],
+    "placementConstraints": [],
+    "compatibilities": [
+        "EC2",
+        "FARGATE"
+    ],
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "cpu": "256",
+    "memory": "512",
+    "registeredAt": "2021-11-13T12:44:53.671000-03:00",
+    "registeredBy": "arn:aws:iam::347857632042:user/iam-joaodaniel"
+}
