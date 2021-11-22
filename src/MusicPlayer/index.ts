@@ -109,6 +109,7 @@ export class MusicPlayer {
   }
 
   public destroy() {
+    this.audioPlayer.stop();
     this.connection.destroy();
   }
 
