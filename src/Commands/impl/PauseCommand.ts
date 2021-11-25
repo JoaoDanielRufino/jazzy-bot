@@ -14,7 +14,7 @@ export class PauseCommand implements CommandChain {
     this.nextCommand = nextCommand;
   }
 
-	public async processCommand(command: string, message: Message, musicPlayer: MusicPlayer) {
+  public async processCommand(command: string, message: Message, musicPlayer: MusicPlayer) {
     if (command !== 'pause') return this.nextCommand.processCommand(command, message, musicPlayer);
 
     musicPlayer.pauseSong();

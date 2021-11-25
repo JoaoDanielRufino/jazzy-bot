@@ -5,7 +5,7 @@ import { PlaySambaCommand } from './PlaySambaCommand';
 import { PlaySambasCommand } from './PlaySambasCommand';
 import { SkipCommand } from './SkipCommand';
 import { LeaveCommand } from './LeaveCommand';
-import { PauseCommand } from './StopCommand';
+import { PauseCommand } from './PauseCommand';
 import { ResumeCommand } from './ResumeCommand';
 import { ClearQueueCommand } from './ClearQueueCommand';
 import { EmptyCommand } from './EmptyCommand';
