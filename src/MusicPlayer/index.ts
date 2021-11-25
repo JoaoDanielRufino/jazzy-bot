@@ -116,6 +116,11 @@ export class MusicPlayer {
     this.audioPlayer.unpause();
   }
 
+  public clearQueue() {
+    this.queue.clear();
+    this.message?.channel.send('Queue is now empty!');
+  }
+
   public destroy() {
     this.audioPlayer.stop();
     this.connection.destroy();

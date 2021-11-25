@@ -13,6 +13,7 @@ import {
   EmptyCommand,
   ResumeCommand,
   PauseCommand,
+  ClearQueueCommand,
 } from '../Commands/impl';
 
 export default class SarveBot {
@@ -40,6 +41,7 @@ export default class SarveBot {
     const leaveCommand = new LeaveCommand();
     const pauseCommand = new PauseCommand();
     const resumeCommand = new ResumeCommand();
+    const clearQueueCommand = new ClearQueueCommand();
     const emptyCommand = new EmptyCommand();
 
     sambaCommand.setNext(sambaPlaylistCommand);
@@ -49,7 +51,8 @@ export default class SarveBot {
     playCommand.setNext(skipCommand);
     skipCommand.setNext(pauseCommand);
     pauseCommand.setNext(resumeCommand);
-    resumeCommand.setNext(leaveCommand);
+    resumeCommand.setNext(clearQueueCommand);
+    clearQueueCommand.setNext(leaveCommand);
     leaveCommand.setNext(emptyCommand);
 
     return sambaCommand;

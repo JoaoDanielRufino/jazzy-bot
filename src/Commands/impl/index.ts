@@ -7,6 +7,7 @@ import { SkipCommand } from './SkipCommand';
 import { LeaveCommand } from './LeaveCommand';
 import { PauseCommand } from './StopCommand';
 import { ResumeCommand } from './ResumeCommand';
+import { ClearQueueCommand } from './ClearQueueCommand';
 import { EmptyCommand } from './EmptyCommand';
 
 export {
@@ -19,5 +20,6 @@ export {
   LeaveCommand,
   PauseCommand,
   ResumeCommand,
+  ClearQueueCommand,
   EmptyCommand,
 };
