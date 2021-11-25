@@ -108,6 +108,14 @@ export class MusicPlayer {
     this.processQueue();
   }
 
+  public pauseSong() {
+    this.audioPlayer.pause();
+  }
+
+  public resumeSong() {
+    this.audioPlayer.unpause();
+  }
+
   public destroy() {
     this.audioPlayer.stop();
     this.connection.destroy();

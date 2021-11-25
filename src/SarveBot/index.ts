@@ -11,6 +11,8 @@ import {
   SkipCommand,
   LeaveCommand,
   EmptyCommand,
+  ResumeCommand,
+  PauseCommand,
 } from '../Commands/impl';
 
 export default class SarveBot {
@@ -36,6 +38,8 @@ export default class SarveBot {
     const playCommand = new PlayCommand();
     const skipCommand = new SkipCommand();
     const leaveCommand = new LeaveCommand();
+    const pauseCommand = new PauseCommand();
+    const resumeCommand = new ResumeCommand();
     const emptyCommand = new EmptyCommand();
 
     sambaCommand.setNext(sambaPlaylistCommand);
@@ -43,7 +47,9 @@ export default class SarveBot {
     memeCommand.setNext(memesPlaylistCommand);
     memesPlaylistCommand.setNext(playCommand);
     playCommand.setNext(skipCommand);
-    skipCommand.setNext(leaveCommand);
+    skipCommand.setNext(pauseCommand);
+    pauseCommand.setNext(resumeCommand);
+    resumeCommand.setNext(leaveCommand);
     leaveCommand.setNext(emptyCommand);
 
     return sambaCommand;
