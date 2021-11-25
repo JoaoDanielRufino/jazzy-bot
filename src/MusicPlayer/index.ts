@@ -71,7 +71,13 @@ export class MusicPlayer {
     const nextSong = this.queue.pop()!;
 
     this.audioPlayer.play(
-      createAudioResource(ytdl(nextSong.url, { filter: 'audioonly', quality: 'highestaudio' }))
+      createAudioResource(
+        ytdl(nextSong.url, {
+          filter: 'audioonly',
+          quality: 'highestaudio',
+          highWaterMark: 1048576 * 32,
+        })
+      )
     );
 
     console.log(`Playing ${nextSong.title}`);
