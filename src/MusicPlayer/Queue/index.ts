@@ -30,6 +30,10 @@ export class Queue<T> {
     return this.queue.length;
   }
 
+  public clear() {
+    this.queue = new Array<T>();
+  }
+
   public onPushEvent(cb: () => void) {
     this.onPushEventCallback = cb;
   }

@@ -9,12 +9,16 @@ import {
   PlayMemesCommand,
   PlayCommand,
   SkipCommand,
+  LeaveCommand,
   EmptyCommand,
+  ResumeCommand,
+  PauseCommand,
+  ClearQueueCommand,
 } from '../Commands/impl';
 
 export default class SarveBot {
   private client: Client;
-  private readonly PREFIX = 'sarve';
+  private readonly PREFIX = process.env.BOT_PREFIX || 'sarve';
   private commandChain: CommandChain;
   private subscriptions: Map<string, MusicPlayer>;
 
@@ -34,6 +38,10 @@ export default class SarveBot {
     const memesPlaylistCommand = new PlayMemesCommand();
     const playCommand = new PlayCommand();
     const skipCommand = new SkipCommand();
+    const leaveCommand = new LeaveCommand();
+    const pauseCommand = new PauseCommand();
+    const resumeCommand = new ResumeCommand();
+    const clearQueueCommand = new ClearQueueCommand();
     const emptyCommand = new EmptyCommand();
 
     sambaCommand.setNext(sambaPlaylistCommand);
@@ -41,7 +49,11 @@ export default class SarveBot {
     memeCommand.setNext(memesPlaylistCommand);
     memesPlaylistCommand.setNext(playCommand);
     playCommand.setNext(skipCommand);
-    skipCommand.setNext(emptyCommand);
+    skipCommand.setNext(pauseCommand);
+    pauseCommand.setNext(resumeCommand);
+    resumeCommand.setNext(clearQueueCommand);
+    clearQueueCommand.setNext(leaveCommand);
+    leaveCommand.setNext(emptyCommand);
 
     return sambaCommand;
   }
@@ -57,7 +69,10 @@ export default class SarveBot {
       if (newState.status === VoiceConnectionStatus.Disconnected) {
         this.subscriptions.get(voiceChannel.guildId)!.destroy();
         this.subscriptions.delete(voiceChannel.guildId);
-        console.log(`Disconnected from ${voiceChannel.guildId}`);
+        console.log(`Disconnected from ${voiceChannel.guildId} - ${voiceChannel.guild.name}`);
+      } else if (newState.status === VoiceConnectionStatus.Destroyed) {
+        this.subscriptions.delete(voiceChannel.guildId);
+        console.log(`Disconnected from ${voiceChannel.guildId} - ${voiceChannel.guild.name}`);
       }
     });
 

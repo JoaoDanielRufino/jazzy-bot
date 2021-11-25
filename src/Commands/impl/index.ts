@@ -4,6 +4,10 @@ import { PlayMemesCommand } from './PlayMemesCommand';
 import { PlaySambaCommand } from './PlaySambaCommand';
 import { PlaySambasCommand } from './PlaySambasCommand';
 import { SkipCommand } from './SkipCommand';
+import { LeaveCommand } from './LeaveCommand';
+import { PauseCommand } from './PauseCommand';
+import { ResumeCommand } from './ResumeCommand';
+import { ClearQueueCommand } from './ClearQueueCommand';
 import { EmptyCommand } from './EmptyCommand';
 
 export {
@@ -13,5 +17,9 @@ export {
   PlaySambaCommand,
   PlaySambasCommand,
   SkipCommand,
+  LeaveCommand,
+  PauseCommand,
+  ResumeCommand,
+  ClearQueueCommand,
   EmptyCommand,
 };

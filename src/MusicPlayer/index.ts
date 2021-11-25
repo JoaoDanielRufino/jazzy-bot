@@ -108,7 +108,21 @@ export class MusicPlayer {
     this.processQueue();
   }
 
+  public pauseSong() {
+    this.audioPlayer.pause();
+  }
+
+  public resumeSong() {
+    this.audioPlayer.unpause();
+  }
+
+  public clearQueue() {
+    this.queue.clear();
+    this.message?.channel.send('Queue is now empty!');
+  }
+
   public destroy() {
+    this.audioPlayer.stop();
     this.connection.destroy();
   }
 
