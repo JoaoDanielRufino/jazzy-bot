@@ -57,13 +57,13 @@ export default class SarveBot {
     });
 
     connection.on('stateChange', (_, newState) => {
-      if (
-        newState.status === VoiceConnectionStatus.Disconnected ||
-        newState.status === VoiceConnectionStatus.Destroyed
-      ) {
+      if (newState.status === VoiceConnectionStatus.Disconnected) {
         this.subscriptions.get(voiceChannel.guildId)!.destroy();
         this.subscriptions.delete(voiceChannel.guildId);
-        console.log(`Disconnected from ${voiceChannel.guildId}`);
+        console.log(`Disconnected from ${voiceChannel.guildId} - ${voiceChannel.guild.name}`);
+      } else if (newState.status === VoiceConnectionStatus.Destroyed) {
+        this.subscriptions.delete(voiceChannel.guildId);
+        console.log(`Disconnected from ${voiceChannel.guildId} - ${voiceChannel.guild.name}`);
       }
     });
 
