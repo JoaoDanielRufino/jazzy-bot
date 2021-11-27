@@ -10,31 +10,31 @@ import {
 import ytdl from 'ytdl-core';
 import sambasPlaylist from './playlists/sambas.json';
 import memesPlaylist from './playlists/memes.json';
-import { randomIndex, shuffle } from './utils';
+import { getSongInfo, randomIndex, shuffle } from './utils';
 import { Queue } from './Queue';
 import { Message, MessageEmbed } from 'discord.js';
 
 interface SongInfo {
   url: string;
   title: string;
-  thumbnail?: string;
-  duration?: string;
+  thumbnail: string;
+  duration: string;
 }
 
 export class MusicPlayer {
   private connection: VoiceConnection;
   private message?: Message;
   private audioPlayer: AudioPlayer;
-  private sambas: SongInfo[];
-  private memes: SongInfo[];
+  private sambas: string[];
+  private memes: string[];
   private queue: Queue<SongInfo>;
   private lockPushEvent: boolean;
 
   constructor(connection: VoiceConnection) {
     this.audioPlayer = createAudioPlayer();
     this.connection = connection;
-    this.sambas = sambasPlaylist;
-    this.memes = memesPlaylist;
+    this.sambas = sambasPlaylist.map((samba) => samba.url);
+    this.memes = memesPlaylist.map((meme) => meme.url);
     this.queue = new Queue();
     this.lockPushEvent = false;
 
@@ -86,10 +86,9 @@ export class MusicPlayer {
     const embed = new MessageEmbed()
       .setColor('DARK_ORANGE')
       .setTitle('Now playing')
-      .setDescription(`[${nextSong.title}](${nextSong.url})`);
-
-    if (nextSong?.thumbnail) embed.setThumbnail(nextSong.thumbnail!);
-    if (nextSong?.duration) embed.setFields({ name: 'Duration', value: nextSong.duration! });
+      .setDescription(`[${nextSong.title}](${nextSong.url})`)
+      .setThumbnail(nextSong.thumbnail)
+      .setFields({ name: 'Duration', value: nextSong.duration });
 
     console.log(`Playing ${nextSong.title}`);
     this.message?.channel.send({ embeds: [embed] });
@@ -99,24 +98,32 @@ export class MusicPlayer {
     this.queue.push(song);
   }
 
-  public playSamba() {
+  public async playSamba() {
     const sambaIndex = randomIndex(this.sambas);
-    this.queue.push(this.sambas[sambaIndex]);
+    const song = await getSongInfo(this.sambas[sambaIndex]);
+    this.queue.push(song);
   }
 
   public playSambaPlaylist() {
     this.sambas = shuffle(this.sambas);
-    this.sambas.forEach((samba) => this.queue.push(samba));
+    this.sambas.forEach(async (samba) => {
+      const song = await getSongInfo(samba);
+      this.queue.push(song);
+    });
   }
 
-  public playMeme() {
+  public async playMeme() {
     const memeIndex = randomIndex(this.memes);
-    this.queue.push(this.memes[memeIndex]);
+    const song = await getSongInfo(this.memes[memeIndex]);
+    this.queue.push(song);
   }
 
   public playMemes() {
     this.memes = shuffle(this.memes);
-    this.memes.forEach((meme) => this.queue.push(meme));
+    this.memes.forEach(async (meme) => {
+      const song = await getSongInfo(meme);
+      this.queue.push(song);
+    });
   }
 
   public skipSong() {

@@ -4,20 +4,13 @@ import yts from 'yt-search';
 import { MusicPlayer } from '../../MusicPlayer';
 import { CommandChain } from '../CommandChain';
 import { EmptyCommand } from './EmptyCommand';
+import { convertToMinutes } from '../../utils';
 
 export class PlayCommand implements CommandChain {
   private nextCommand: CommandChain;
 
   constructor() {
     this.nextCommand = new EmptyCommand();
-  }
-
-  private convertToMinutes(seconds: string) {
-    const intSeconds = parseInt(seconds);
-    const minutes = Math.floor(intSeconds / 60);
-    const remainingSeconds = intSeconds - minutes * 60;
-
-    return `${minutes}:${remainingSeconds}`;
   }
 
   public setNext(nextCommand: CommandChain) {
@@ -35,7 +28,7 @@ export class PlayCommand implements CommandChain {
         url,
         title: info.videoDetails.title,
         thumbnail: info.videoDetails.thumbnails[0].url,
-        duration: this.convertToMinutes(info.videoDetails.lengthSeconds),
+        duration: convertToMinutes(info.videoDetails.lengthSeconds),
       });
     } else {
       const query = command.split('play ')[1];
