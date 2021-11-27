@@ -1,3 +1,4 @@
+import { Message } from 'discord.js';
 import {
   AudioPlayer,
   AudioPlayerError,
@@ -12,9 +13,9 @@ import sambasPlaylist from './playlists/sambas.json';
 import memesPlaylist from './playlists/memes.json';
 import { getSongInfo, randomIndex, shuffle } from './utils';
 import { Queue } from './Queue';
-import { Message, MessageEmbed } from 'discord.js';
+import { MusicPlayerEmbeds } from './MusicPlayerEmbeds';
 
-interface SongInfo {
+export interface SongInfo {
   url: string;
   title: string;
   thumbnail: string;
@@ -29,6 +30,7 @@ export class MusicPlayer {
   private memes: string[];
   private queue: Queue<SongInfo>;
   private lockPushEvent: boolean;
+  private embedMessages: MusicPlayerEmbeds;
 
   constructor(connection: VoiceConnection) {
     this.audioPlayer = createAudioPlayer();
@@ -37,6 +39,7 @@ export class MusicPlayer {
     this.memes = memesPlaylist.map((meme) => meme.url);
     this.queue = new Queue();
     this.lockPushEvent = false;
+    this.embedMessages = new MusicPlayerEmbeds();
 
     this.queue.onPushEvent(this.handleQueuePush.bind(this));
     this.audioPlayer.on('stateChange', this.handleStateChange.bind(this));
@@ -60,7 +63,7 @@ export class MusicPlayer {
   private handleError(err: AudioPlayerError) {
     console.log('Error message: ', err.message);
     console.log(err);
-    this.message?.channel.send('Failed to play song');
+    this.message?.channel.send({ embeds: [this.embedMessages.failedToPlaySongEmbed()] });
     this.processQueue();
   }
 
@@ -83,15 +86,8 @@ export class MusicPlayer {
       )
     );
 
-    const embed = new MessageEmbed()
-      .setColor('DARK_ORANGE')
-      .setTitle('Now playing')
-      .setDescription(`[${nextSong.title}](${nextSong.url})`)
-      .setThumbnail(nextSong.thumbnail)
-      .setFields({ name: 'Duration', value: nextSong.duration });
-
     console.log(`Playing ${nextSong.title}`);
-    this.message?.channel.send({ embeds: [embed] });
+    this.message?.channel.send({ embeds: [this.embedMessages.playingInfoEmbed(nextSong)] });
   }
 
   public play(song: SongInfo) {
@@ -128,7 +124,7 @@ export class MusicPlayer {
 
   public skipSong() {
     this.audioPlayer.stop();
-    this.message?.channel.send('Skipping song...');
+    this.message?.channel.send({ embeds: [this.embedMessages.skipSongEmbed()] });
     this.processQueue();
   }
 
@@ -142,7 +138,7 @@ export class MusicPlayer {
 
   public clearQueue() {
     this.queue.clear();
-    this.message?.channel.send('Queue is now empty!');
+    this.message?.channel.send({ embeds: [this.embedMessages.clearQueueEmbed()] });
   }
 
   public destroy() {
