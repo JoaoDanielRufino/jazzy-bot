@@ -12,6 +12,14 @@ export class PlayCommand implements CommandChain {
     this.nextCommand = new EmptyCommand();
   }
 
+  private convertToMinutes(seconds: string) {
+    const intSeconds = parseInt(seconds);
+    const minutes = Math.floor(intSeconds / 60);
+    const remainingSeconds = intSeconds - minutes * 60;
+
+    return `${minutes}:${remainingSeconds}`;
+  }
+
   public setNext(nextCommand: CommandChain) {
     this.nextCommand = nextCommand;
   }
@@ -23,12 +31,22 @@ export class PlayCommand implements CommandChain {
     if (command.includes('https')) {
       const url = command.split(' ')[1];
       const info = await getInfo(url);
-      musicPlayer.play({ url, title: info.videoDetails.title });
+      musicPlayer.play({
+        url,
+        title: info.videoDetails.title,
+        thumbnail: info.videoDetails.thumbnails[0].url,
+        duration: this.convertToMinutes(info.videoDetails.lengthSeconds),
+      });
     } else {
       const query = command.split('play ')[1];
       const response = await yts(query);
       const video = response.videos[0];
-      musicPlayer.play({ url: video.url, title: video.title });
+      musicPlayer.play({
+        url: video.url,
+        title: video.title,
+        thumbnail: video.thumbnail,
+        duration: video.duration.timestamp,
+      });
     }
   }
 }

@@ -12,11 +12,13 @@ import sambasPlaylist from './playlists/sambas.json';
 import memesPlaylist from './playlists/memes.json';
 import { randomIndex, shuffle } from './utils';
 import { Queue } from './Queue';
-import { Message } from 'discord.js';
+import { Message, MessageEmbed } from 'discord.js';
 
 interface SongInfo {
   url: string;
   title: string;
+  thumbnail?: string;
+  duration?: string;
 }
 
 export class MusicPlayer {
@@ -56,6 +58,7 @@ export class MusicPlayer {
   }
 
   private handleError(err: AudioPlayerError) {
+    console.log('Error message: ', err.message);
     console.log(err);
     this.message?.channel.send('Failed to play song');
     this.processQueue();
@@ -80,8 +83,16 @@ export class MusicPlayer {
       )
     );
 
+    const embed = new MessageEmbed()
+      .setColor('DARK_ORANGE')
+      .setTitle('Now playing')
+      .setDescription(`[${nextSong.title}](${nextSong.url})`);
+
+    if (nextSong?.thumbnail) embed.setThumbnail(nextSong.thumbnail!);
+    if (nextSong?.duration) embed.setFields({ name: 'Duration', value: nextSong.duration! });
+
     console.log(`Playing ${nextSong.title}`);
-    this.message?.channel.send(`Now playing: ${nextSong.title}`);
+    this.message?.channel.send({ embeds: [embed] });
   }
 
   public play(song: SongInfo) {
