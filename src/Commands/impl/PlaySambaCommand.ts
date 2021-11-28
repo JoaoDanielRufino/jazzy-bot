@@ -17,6 +17,6 @@ export class PlaySambaCommand implements CommandChain {
   public async processCommand(command: string, message: Message, musicPlayer: MusicPlayer) {
     if (command !== 'samba') return this.nextCommand.processCommand(command, message, musicPlayer);
 
-    musicPlayer.playSamba();
+    await musicPlayer.playSamba();
   }
 }

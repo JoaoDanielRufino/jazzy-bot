@@ -17,6 +17,6 @@ export class PlayMemeCommand implements CommandChain {
   public async processCommand(command: string, message: Message, musicPlayer: MusicPlayer) {
     if (command !== 'meme') return this.nextCommand.processCommand(command, message, musicPlayer);
 
-    musicPlayer.playMeme();
+    await musicPlayer.playMeme();
   }
 }

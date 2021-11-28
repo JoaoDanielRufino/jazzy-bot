@@ -4,6 +4,7 @@ import yts from 'yt-search';
 import { MusicPlayer } from '../../MusicPlayer';
 import { CommandChain } from '../CommandChain';
 import { EmptyCommand } from './EmptyCommand';
+import { convertToMinutes } from '../../utils';
 
 export class PlayCommand implements CommandChain {
   private nextCommand: CommandChain;
@@ -23,12 +24,22 @@ export class PlayCommand implements CommandChain {
     if (command.includes('https')) {
       const url = command.split(' ')[1];
       const info = await getInfo(url);
-      musicPlayer.play({ url, title: info.videoDetails.title });
+      musicPlayer.play({
+        url,
+        title: info.videoDetails.title,
+        thumbnail: info.videoDetails.thumbnails[0].url,
+        duration: convertToMinutes(info.videoDetails.lengthSeconds),
+      });
     } else {
       const query = command.split('play ')[1];
       const response = await yts(query);
       const video = response.videos[0];
-      musicPlayer.play({ url: video.url, title: video.title });
+      musicPlayer.play({
+        url: video.url,
+        title: video.title,
+        thumbnail: video.thumbnail,
+        duration: video.duration.timestamp,
+      });
     }
   }
 }
