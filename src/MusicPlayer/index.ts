@@ -30,6 +30,8 @@ export class MusicPlayer {
   private memes: string[];
   private queue: Queue<SongInfo>;
   private lockPushEvent: boolean;
+  private lockEnqueueMessage: boolean;
+  private isPlaying: boolean;
   private embedMessages: MusicPlayerEmbeds;
 
   constructor(connection: VoiceConnection) {
@@ -39,6 +41,8 @@ export class MusicPlayer {
     this.memes = memesPlaylist.map((meme) => meme.url);
     this.queue = new Queue();
     this.lockPushEvent = false;
+    this.lockEnqueueMessage = false;
+    this.isPlaying = false;
     this.embedMessages = new MusicPlayerEmbeds();
 
     this.queue.onPushEvent(this.handleQueuePush.bind(this));
@@ -48,9 +52,14 @@ export class MusicPlayer {
   }
 
   private handleStateChange(oldState: AudioPlayerState, newState: AudioPlayerState) {
-    console.log(`oldState: ${oldState.status} - newState: ${newState.status}`);
+    if (newState.status === AudioPlayerStatus.Buffering)
+      console.log('Buffering', newState.resource.metadata);
+
     if (newState.status !== AudioPlayerStatus.Idle) this.lockPushEvent = true;
     else this.lockPushEvent = false;
+
+    if (newState.status === AudioPlayerStatus.Playing) this.isPlaying = true;
+    else this.isPlaying = false;
 
     if (
       oldState.status === AudioPlayerStatus.Playing &&
@@ -67,7 +76,12 @@ export class MusicPlayer {
     this.processQueue();
   }
 
-  private handleQueuePush() {
+  private handleQueuePush(song: SongInfo) {
+    if (this.isPlaying && !this.lockEnqueueMessage)
+      this.message?.channel.send({
+        embeds: [this.embedMessages.enqueueSongEmbed(song, this.queue.size().toString())],
+      });
+
     if (!this.lockPushEvent) this.processQueue();
   }
 
@@ -82,7 +96,8 @@ export class MusicPlayer {
           filter: 'audioonly',
           quality: 'highestaudio',
           highWaterMark: 1048576 * 32,
-        })
+        }),
+        { metadata: nextSong }
       )
     );
 
@@ -103,8 +118,10 @@ export class MusicPlayer {
   public playSambaPlaylist() {
     this.sambas = shuffle(this.sambas);
     this.sambas.forEach(async (samba) => {
+      this.lockEnqueueMessage = true;
       const song = await getSongInfo(samba);
       this.queue.push(song);
+      this.lockEnqueueMessage = false;
     });
   }
 
@@ -117,8 +134,10 @@ export class MusicPlayer {
   public playMemes() {
     this.memes = shuffle(this.memes);
     this.memes.forEach(async (meme) => {
+      this.lockEnqueueMessage = true;
       const song = await getSongInfo(meme);
       this.queue.push(song);
+      this.lockEnqueueMessage = false;
     });
   }
 

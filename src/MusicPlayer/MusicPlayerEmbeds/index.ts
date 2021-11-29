@@ -20,6 +20,18 @@ export class MusicPlayerEmbeds {
       .setDescription('Try again');
   }
 
+  public enqueueSongEmbed({ title, url, thumbnail, duration }: SongInfo, position: string) {
+    return new MessageEmbed()
+      .setColor(this.COLOR)
+      .setTitle('Song successfully enqueued')
+      .setDescription(`[${title}](${url})`)
+      .setThumbnail(thumbnail)
+      .setFields(
+        { name: 'Duration', value: duration, inline: true },
+        { name: 'Position on queue', value: position, inline: true }
+      );
+  }
+
   public skipSongEmbed() {
     return new MessageEmbed().setColor(this.COLOR).setTitle('Skipping song...');
   }
