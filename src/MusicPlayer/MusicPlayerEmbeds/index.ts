@@ -20,7 +20,7 @@ export class MusicPlayerEmbeds {
       .setDescription('Try again');
   }
 
-  public enqueueSongEmbed({ title, url, thumbnail, duration }: SongInfo, position: string) {
+  public enqueueSongEmbed({ title, url, thumbnail, duration }: SongInfo, position: number) {
     return new MessageEmbed()
       .setColor(this.COLOR)
       .setTitle('Song successfully enqueued')
@@ -28,7 +28,7 @@ export class MusicPlayerEmbeds {
       .setThumbnail(thumbnail)
       .setFields(
         { name: 'Duration', value: duration, inline: true },
-        { name: 'Position on queue', value: position, inline: true }
+        { name: 'Position on queue', value: position.toString(), inline: true }
       );
   }
 
@@ -38,5 +38,19 @@ export class MusicPlayerEmbeds {
 
   public clearQueueEmbed() {
     return new MessageEmbed().setColor(this.COLOR).setTitle('Queue is now empty!');
+  }
+
+  public loadingSambaPlaylist(numberOfSongs: number) {
+    return new MessageEmbed()
+      .setColor(this.COLOR)
+      .setTitle('Loading samba playlist...')
+      .setFields({ name: 'Number of songs', value: numberOfSongs.toString() });
+  }
+
+  public loadingMemePlaylist(numberOfSongs: number) {
+    return new MessageEmbed()
+      .setColor(this.COLOR)
+      .setTitle('Loading meme playlist...')
+      .setFields({ name: 'Number of songs', value: numberOfSongs.toString() });
   }
 }

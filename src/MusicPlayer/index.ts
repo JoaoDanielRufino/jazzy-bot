@@ -78,7 +78,7 @@ export class MusicPlayer {
   private handleQueuePush(song: SongInfo) {
     if (this.isPlaying && !this.lockEnqueueMessage)
       this.message?.channel.send({
-        embeds: [this.embedMessages.enqueueSongEmbed(song, this.queue.size().toString())],
+        embeds: [this.embedMessages.enqueueSongEmbed(song, this.queue.size())],
       });
 
     if (!this.lockPushEvent) this.processQueue();
@@ -115,6 +115,9 @@ export class MusicPlayer {
   }
 
   public playSambaPlaylist() {
+    this.message?.channel.send({
+      embeds: [this.embedMessages.loadingSambaPlaylist(this.sambas.length)],
+    });
     this.sambas = shuffle(this.sambas);
     this.sambas.forEach(async (samba) => {
       this.lockEnqueueMessage = true;
@@ -131,6 +134,9 @@ export class MusicPlayer {
   }
 
   public playMemes() {
+    this.message?.channel.send({
+      embeds: [this.embedMessages.loadingMemePlaylist(this.memes.length)],
+    });
     this.memes = shuffle(this.memes);
     this.memes.forEach(async (meme) => {
       this.lockEnqueueMessage = true;
