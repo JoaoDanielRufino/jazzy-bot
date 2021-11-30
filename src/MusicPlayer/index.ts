@@ -70,7 +70,6 @@ export class MusicPlayer {
   }
 
   private handleError(err: AudioPlayerError) {
-    console.log('Error message: ', err.message);
     console.log(err);
     this.message?.channel.send({ embeds: [this.embedMessages.failedToPlaySongEmbed()] });
     this.processQueue();
