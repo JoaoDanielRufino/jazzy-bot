@@ -1,6 +1,6 @@
 export class Queue<T> {
   private queue: Array<T>;
-  private onPushEventCallback?: () => void;
+  private onPushEventCallback?: (item: T) => void;
 
   constructor() {
     this.queue = new Array<T>();
@@ -13,7 +13,7 @@ export class Queue<T> {
   public push(item: T) {
     this.queue.push(item);
 
-    if (this.onPushEventCallback) this.onPushEventCallback();
+    if (this.onPushEventCallback) this.onPushEventCallback(item);
   }
 
   public pop() {
@@ -34,7 +34,7 @@ export class Queue<T> {
     this.queue = new Array<T>();
   }
 
-  public onPushEvent(cb: () => void) {
+  public onPushEvent(cb: (item: T) => void) {
     this.onPushEventCallback = cb;
   }
 }
