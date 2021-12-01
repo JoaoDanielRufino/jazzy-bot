@@ -5,6 +5,7 @@ import { MusicPlayer } from '../../MusicPlayer';
 import { CommandChain } from '../CommandChain';
 import { EmptyCommand } from './EmptyCommand';
 import { convertToMinutes } from '../../utils';
+import { YouTubeClient } from '../../YouTubeClient';
 
 export class PlayCommand implements CommandChain {
   private nextCommand: CommandChain;
@@ -31,7 +32,10 @@ export class PlayCommand implements CommandChain {
         duration: convertToMinutes(info.videoDetails.lengthSeconds),
       });
     } else {
+      const ytClient = new YouTubeClient(process.env.YOUTUBE_API!);
       const query = command.split('play ')[1];
+      const res = await ytClient.search({ q: query, maxResults: 5 });
+      console.log(res);
       const response = await yts(query);
       const video = response.videos[0];
       musicPlayer.play({
