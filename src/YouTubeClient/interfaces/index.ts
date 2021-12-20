@@ -27,7 +27,7 @@ interface Snippet {
   publishTime: string;
 }
 
-interface Item {
+interface SearchItem {
   kind: string;
   etag: string;
   id: {
@@ -35,6 +35,22 @@ interface Item {
     videoId: string;
   };
   snippet: Snippet;
+}
+
+interface ContentDetails {
+  duration: string;
+  dimension: string;
+  definition: string;
+  caption: string;
+  licensedContent: boolean;
+  projection: string;
+}
+
+interface VideoInfoItem {
+  kind: string;
+  etag: string;
+  id: string;
+  contentDetails: ContentDetails;
 }
 
 export interface SearchRequest {
@@ -47,9 +63,19 @@ export interface SearchResponse {
   etag: string;
   nextPageToken: string;
   regionCode: string;
-  pageInfo: {
-    totalResults: number;
-    resultsPerPage: number;
+  pageinfo: {
+    totalresults: number;
+    resultsperpage: number;
   };
-  items: Item[];
+  items: SearchItem[];
+}
+
+export interface VideoInfoResponse {
+  kind: string;
+  etag: string;
+  items: VideoInfoItem[];
+  pageinfo: {
+    totalresults: number;
+    resultsperpage: number;
+  };
 }

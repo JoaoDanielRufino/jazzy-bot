@@ -1,6 +1,5 @@
 import { Message } from 'discord.js';
 import { getInfo } from 'ytdl-core';
-import yts from 'yt-search';
 import { MusicPlayer } from '../../MusicPlayer';
 import { CommandChain } from '../CommandChain';
 import { EmptyCommand } from './EmptyCommand';
@@ -9,9 +8,11 @@ import { YouTubeClient } from '../../YouTubeClient';
 
 export class PlayCommand implements CommandChain {
   private nextCommand: CommandChain;
+  private ytClient: YouTubeClient;
 
   constructor() {
     this.nextCommand = new EmptyCommand();
+    this.ytClient = new YouTubeClient(process.env.YOUTUBE_API!);
   }
 
   public setNext(nextCommand: CommandChain) {
@@ -32,17 +33,17 @@ export class PlayCommand implements CommandChain {
         duration: convertToMinutes(info.videoDetails.lengthSeconds),
       });
     } else {
-      const ytClient = new YouTubeClient(process.env.YOUTUBE_API!);
       const query = command.split('play ')[1];
-      const res = await ytClient.search({ q: query, maxResults: 5 });
-      console.log(res);
-      const response = await yts(query);
-      const video = response.videos[0];
+      const searchResponse = await this.ytClient.search({ q: query, maxResults: 5 });
+      const firstSearch = searchResponse.items[0];
+
+      const videoInfo = await this.ytClient.videoInfo(firstSearch.id.videoId);
+
       musicPlayer.play({
-        url: video.url,
-        title: video.title,
-        thumbnail: video.thumbnail,
-        duration: video.duration.timestamp,
+        url: `https://youtube.com/watch?v=${firstSearch.id.videoId}`,
+        title: firstSearch.snippet.title,
+        thumbnail: firstSearch.snippet.thumbnails.default.url,
+        duration: videoInfo.items[0].contentDetails.duration,
       });
     }
   }
