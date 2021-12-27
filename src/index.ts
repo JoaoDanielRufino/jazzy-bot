@@ -36,7 +36,6 @@ async function getYoutubeApiToken() {
 async function main() {
   try {
     const discordToken = process.env.BOT_TOKEN || (await getSSMToken());
-    await client.login(discordToken);
 
     if (!process.env.YOUTUBE_API) {
       const youtubeApiKey = await getYoutubeApiToken();
@@ -44,6 +43,7 @@ async function main() {
     }
 
     new SarveBot(client);
+    await client.login(discordToken);
   } catch (err) {
     console.log(err);
   }

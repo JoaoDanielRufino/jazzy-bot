@@ -114,17 +114,19 @@ export class MusicPlayer {
     this.queue.push(song);
   }
 
-  public playSambaPlaylist() {
+  public async playSambaPlaylist() {
     this.message?.channel.send({
       embeds: [this.embedMessages.loadingSambaPlaylist(this.sambas.length)],
     });
+
     this.sambas = shuffle(this.sambas);
-    this.sambas.forEach(async (samba) => {
-      this.lockEnqueueMessage = true;
-      const song = await getSongInfo(samba);
-      this.queue.push(song);
-      this.lockEnqueueMessage = false;
-    });
+
+    const songsPromises = this.sambas.map((samba) => getSongInfo(samba));
+    const songs = await Promise.all(songsPromises);
+
+    this.lockEnqueueMessage = true;
+    songs.forEach((song) => this.queue.push(song));
+    this.lockEnqueueMessage = false;
   }
 
   public async playMeme() {
@@ -133,17 +135,19 @@ export class MusicPlayer {
     this.queue.push(song);
   }
 
-  public playMemes() {
+  public async playMemes() {
     this.message?.channel.send({
       embeds: [this.embedMessages.loadingMemePlaylist(this.memes.length)],
     });
+
     this.memes = shuffle(this.memes);
-    this.memes.forEach(async (meme) => {
-      this.lockEnqueueMessage = true;
-      const song = await getSongInfo(meme);
-      this.queue.push(song);
-      this.lockEnqueueMessage = false;
-    });
+
+    const songsPromises = this.memes.map((meme) => getSongInfo(meme));
+    const songs = await Promise.all(songsPromises);
+
+    this.lockEnqueueMessage = true;
+    songs.forEach((song) => this.queue.push(song));
+    this.lockEnqueueMessage = false;
   }
 
   public skipSong() {
