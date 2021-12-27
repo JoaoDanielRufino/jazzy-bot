@@ -14,7 +14,7 @@ export class YouTubeClient {
     });
   }
 
-  public async search(request: SearchRequest) {
+  public async search(request: SearchRequest): Promise<SearchResponse> {
     const params = {
       key: this.apiKey,
       ...request,
@@ -26,7 +26,7 @@ export class YouTubeClient {
     return response.data;
   }
 
-  public async videoInfo(videoId: string) {
+  public async videoInfo(videoId: string): Promise<VideoInfoResponse> {
     const params = {
       key: this.apiKey,
       part: 'contentDetails',
