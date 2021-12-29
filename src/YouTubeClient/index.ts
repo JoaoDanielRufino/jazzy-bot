@@ -14,22 +14,10 @@ export class YouTubeClient {
     });
   }
 
-  public async search(request: SearchRequest) {
+  private async videoInfo(videoId: string): Promise<VideoInfoResponse> {
     const params = {
       key: this.apiKey,
-      ...request,
-      part: 'snippet',
-    };
-
-    const response = await this.api.get<SearchResponse>(`/search?${queryString.stringify(params)}`);
-
-    return response.data;
-  }
-
-  public async videoInfo(videoId: string) {
-    const params = {
-      key: this.apiKey,
-      part: 'contentDetails',
+      part: 'snippet,contentDetails',
       id: videoId,
     };
 
@@ -42,8 +30,30 @@ export class YouTubeClient {
 
     data.items[0].contentDetails.duration = parsedDuration.hours
       ? `${parsedDuration.hours}:${parsedDuration.minutes}:${parsedDuration.seconds}`
-      : `${parsedDuration.minutes}:${parsedDuration.seconds}`;
+      : `${parsedDuration.minutes || 0}:${parsedDuration.seconds}`;
 
     return data;
+  }
+
+  public async search(request: SearchRequest): Promise<SearchResponse> {
+    const params = {
+      key: this.apiKey,
+      ...request,
+      part: 'snippet',
+    };
+
+    const response = await this.api.get<SearchResponse>(`/search?${queryString.stringify(params)}`);
+
+    return response.data;
+  }
+
+  public async getVideoInfoById(videoId: string): Promise<VideoInfoResponse> {
+    return await this.videoInfo(videoId);
+  }
+
+  public async getVideoInfoByUrl(url: string): Promise<VideoInfoResponse> {
+    const parsedUrl = queryString.parseUrl(url);
+    const videoId = parsedUrl.query['v'] as string;
+    return await this.videoInfo(videoId);
   }
 }

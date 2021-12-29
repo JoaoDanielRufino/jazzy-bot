@@ -1,5 +1,5 @@
-import { getInfo } from 'ytdl-core';
-import { convertToMinutes } from '../../utils';
+import { SongInfo } from '..';
+import { VideoInfoResponse } from '../../YouTubeClient/interfaces';
 
 export function shuffle(arr: Array<any>) {
   for (let i = arr.length - 1; i > 0; i--) {
@@ -14,11 +14,11 @@ export function randomIndex(arr: Array<any>) {
   return Math.floor(Math.random() * arr.length);
 }
 
-export async function getSongInfo(url: string) {
-  const info = await getInfo(url);
-  const title = info.videoDetails.title;
-  const thumbnail = info.videoDetails.thumbnails[0].url;
-  const duration = convertToMinutes(info.videoDetails.lengthSeconds);
+export function parseVideoInfo(videoInfo: VideoInfoResponse): SongInfo {
+  const url = `https://youtube.com/watch?v=${videoInfo.items[0].id}`;
+  const title = videoInfo.items[0].snippet.title;
+  const thumbnail = videoInfo.items[0].snippet.thumbnails.default.url;
+  const duration = videoInfo.items[0].contentDetails.duration;
 
   return { url, title, thumbnail, duration };
 }

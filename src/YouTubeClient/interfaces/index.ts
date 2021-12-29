@@ -50,6 +50,7 @@ interface VideoInfoItem {
   kind: string;
   etag: string;
   id: string;
+  snippet: Snippet;
   contentDetails: ContentDetails;
 }
 

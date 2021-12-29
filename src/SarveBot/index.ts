@@ -70,7 +70,10 @@ export default class SarveBot {
         this.subscriptions.get(voiceChannel.guildId)!.destroy();
         this.subscriptions.delete(voiceChannel.guildId);
         console.log(`Disconnected from ${voiceChannel.guildId} - ${voiceChannel.guild.name}`);
-      } else if (newState.status === VoiceConnectionStatus.Destroyed) {
+      } else if (
+        newState.status === VoiceConnectionStatus.Destroyed &&
+        this.subscriptions.has(voiceChannel.guildId)
+      ) {
         this.subscriptions.delete(voiceChannel.guildId);
         console.log(`Disconnected from ${voiceChannel.guildId} - ${voiceChannel.guild.name}`);
       }

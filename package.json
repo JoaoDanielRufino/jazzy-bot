@@ -25,6 +25,6 @@
     "query-string": "^7.0.1",
     "tinyduration": "^3.2.2",
     "ts-node": "^10.4.0",
-    "ytdl-core": "^4.9.1"
+    "ytdl-core": "^4.9.2"
   }
 }
