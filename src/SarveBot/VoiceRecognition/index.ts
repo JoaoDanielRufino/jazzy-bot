@@ -2,12 +2,19 @@ import { EndBehaviorType, VoiceConnection, VoiceReceiver } from '@discordjs/voic
 import googleSpeech, { SpeechClient } from '@google-cloud/speech';
 import { pipeline } from 'node:stream';
 import prism from 'prism-media';
+import { TypedEmitter } from 'tiny-typed-emitter';
 
-export class VoiceRecognition {
+interface VoiceRecognitionEvents {
+  data: (prediction: string) => void;
+  error: (err: any) => void;
+}
+
+export class VoiceRecognition extends TypedEmitter<VoiceRecognitionEvents> {
   private receiver: VoiceReceiver;
   private speechClient: SpeechClient;
 
   constructor(connection: VoiceConnection) {
+    super();
     this.receiver = connection.receiver;
     this.speechClient = new googleSpeech.SpeechClient({
       credentials: {
@@ -18,13 +25,11 @@ export class VoiceRecognition {
   }
 
   private startSpeakingHandler(userId: string) {
-    console.log('Started speaking', userId);
-
     const streamRecognizer = this.speechClient.streamingRecognize({
-      config: { encoding: 'LINEAR16', sampleRateHertz: 48000, languageCode: 'pt-BR' },
+      config: { encoding: 'LINEAR16', sampleRateHertz: 48000, languageCode: 'en-US' },
     });
 
-    streamRecognizer.on('error', this.handleErrorRecognizer.bind(this));
+    streamRecognizer.on('error', (err) => this.emit('error', err));
     streamRecognizer.on('data', this.handleDataRecognizer.bind(this));
 
     const opusStream = this.receiver.subscribe(userId, {
@@ -37,25 +42,16 @@ export class VoiceRecognition {
     const prismDecoder = new prism.opus.Decoder({ channels: 1, rate: 48000, frameSize: 960 });
 
     pipeline(opusStream, prismDecoder, streamRecognizer, (err) => {
-      if (err) console.log(err);
+      this.emit('error', err);
     });
   }
 
-  private endSpeakingHandler(userId: string) {
-    console.log('Ended speaking', userId);
-  }
-
   private handleDataRecognizer(response: any) {
-    console.log(response.results[0].alternatives);
-  }
-
-  private handleErrorRecognizer(err: Error) {
-    console.log(err);
+    this.emit('data', response.results[0].alternatives[0].transcript);
   }
 
   public startRecognition() {
     this.receiver.speaking.on('start', this.startSpeakingHandler.bind(this));
-    this.receiver.speaking.on('end', this.endSpeakingHandler.bind(this));
   }
 
   public stopRecognition() {

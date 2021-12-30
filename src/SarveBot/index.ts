@@ -95,6 +95,22 @@ export default class SarveBot {
     return connection;
   }
 
+  private initializeVoiceRecoginition(voiceRecognition: VoiceRecognition, message: Message) {
+    voiceRecognition.on('data', (prediction) =>
+      this.handlePrediction.bind(this, prediction.toLowerCase(), message)()
+    );
+
+    voiceRecognition.on('error', (err) => console.log(err));
+  }
+
+  private handlePrediction(prediction: string, message: Message) {
+    console.log({ prediction, guildId: message.guildId });
+    if (!prediction.startsWith('jazzy')) return;
+
+    const command = prediction.substr('jazzy'.length + 1);
+    this.commandChain.processCommand(command, message, this.subscriptions.get(message.guildId!)!);
+  }
+
   private async onMessageCreate(message: Message) {
     if (!message.content.startsWith(this.PREFIX)) return;
 
@@ -112,6 +128,8 @@ export default class SarveBot {
       const voiceConnection = this.createVoiceConnection(voiceChannel);
 
       const voiceRecognition = new VoiceRecognition(voiceConnection);
+      this.initializeVoiceRecoginition(voiceRecognition, message);
+
       musicPlayer = new MusicPlayer(voiceConnection);
 
       this.subscriptions.set(guildId, { musicPlayer, voiceRecognition });

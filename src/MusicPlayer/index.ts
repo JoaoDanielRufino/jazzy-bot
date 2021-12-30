@@ -55,14 +55,13 @@ export class MusicPlayer {
   }
 
   private handleStateChange(oldState: AudioPlayerState, newState: AudioPlayerState) {
-    if (newState.status === AudioPlayerStatus.Buffering)
-      console.log('Buffering', newState.resource.metadata);
-
     if (newState.status !== AudioPlayerStatus.Idle) this.lockPushEvent = true;
     else this.lockPushEvent = false;
 
-    if (newState.status === AudioPlayerStatus.Playing) this.isPlaying = true;
-    else this.isPlaying = false;
+    if (newState.status === AudioPlayerStatus.Playing) {
+      console.log('Playing', newState.resource.metadata);
+      this.isPlaying = true;
+    } else this.isPlaying = false;
 
     if (
       oldState.status === AudioPlayerStatus.Playing &&
