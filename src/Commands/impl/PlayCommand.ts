@@ -1,9 +1,7 @@
 import { Message } from 'discord.js';
-import { getInfo } from 'ytdl-core';
 import { MusicPlayer } from '../../MusicPlayer';
 import { CommandChain } from '../CommandChain';
 import { EmptyCommand } from './EmptyCommand';
-import { convertToMinutes } from '../../utils';
 import { YouTubeClient } from '../../YouTubeClient';
 
 export class PlayCommand implements CommandChain {
@@ -25,19 +23,20 @@ export class PlayCommand implements CommandChain {
 
     if (command.includes('https')) {
       const url = command.split(' ')[1];
-      const info = await getInfo(url);
+      const info = await this.ytClient.getVideoInfoByUrl(url);
       musicPlayer.play({
         url,
-        title: info.videoDetails.title,
-        thumbnail: info.videoDetails.thumbnails[0].url,
-        duration: convertToMinutes(info.videoDetails.lengthSeconds),
+        title: info.items[0].snippet.title,
+        thumbnail: info.items[0].snippet.thumbnails.default.url,
+        duration: info.items[0].contentDetails.duration,
       });
     } else {
+      this.ytClient.getVideoInfoByUrl('https://www.youtube.com/watch?v=RvnkAtWcKYg');
       const query = command.split('play ')[1];
       const searchResponse = await this.ytClient.search({ q: query, maxResults: 5 });
       const firstSearch = searchResponse.items[0];
 
-      const videoInfo = await this.ytClient.videoInfo(firstSearch.id.videoId);
+      const videoInfo = await this.ytClient.getVideoInfoById(firstSearch.id.videoId);
 
       musicPlayer.play({
         url: `https://youtube.com/watch?v=${firstSearch.id.videoId}`,
