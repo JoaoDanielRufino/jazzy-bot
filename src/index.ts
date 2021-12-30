@@ -11,39 +11,60 @@ const client = new Client({
 
 const ssmClient = new SSMClient({ region: 'us-east-1' });
 
-async function getSSMToken() {
-  const data = await ssmClient.send(
-    new GetParameterCommand({
-      Name: 'sarve-bot-parameter-store-token',
-      WithDecryption: true,
-    })
-  );
+async function getParameters() {
+  const data = await Promise.all([
+    ssmClient.send(
+      new GetParameterCommand({
+        Name: 'sarve-bot-parameter-store-token',
+        WithDecryption: true,
+      })
+    ),
+    ssmClient.send(
+      new GetParameterCommand({
+        Name: 'youtube-api-parameter-store',
+        WithDecryption: true,
+      })
+    ),
+    ssmClient.send(
+      new GetParameterCommand({
+        Name: 'gcloud-sarve-bot-email',
+        WithDecryption: true,
+      })
+    ),
+    ssmClient.send(
+      new GetParameterCommand({
+        Name: 'gcloud-sarve-bot-private-key',
+        WithDecryption: true,
+      })
+    ),
+  ]);
 
-  return data.Parameter?.Value;
-}
+  const parameters: { [key: string]: string } = {};
+  data.forEach((parameter) => {
+    const name = parameter.Parameter?.Name as string;
+    parameters[name] = parameter.Parameter?.Value as string;
+  });
 
-async function getYoutubeApiToken() {
-  const data = await ssmClient.send(
-    new GetParameterCommand({
-      Name: 'youtube-api-parameter-store',
-      WithDecryption: true,
-    })
-  );
-
-  return data.Parameter?.Value;
+  return parameters;
 }
 
 async function main() {
   try {
-    const discordToken = process.env.BOT_TOKEN || (await getSSMToken());
-
-    if (!process.env.YOUTUBE_API) {
-      const youtubeApiKey = await getYoutubeApiToken();
-      process.env.YOUTUBE_API = youtubeApiKey;
+    if (
+      !process.env.BOT_TOKEN ||
+      !process.env.YOUTUBE_API ||
+      !process.env.GCLOUD_EMAIL ||
+      !process.env.GCLOUD_PRIVATE_KEY
+    ) {
+      const parameters = await getParameters();
+      process.env.BOT_TOKEN = parameters['sarve-bot-parameter-store-token'];
+      process.env.YOUTUBE_API = parameters['youtube-api-parameter-store'];
+      process.env.GCLOUD_EMAIL = parameters['gcloud-sarve-bot-email'];
+      process.env.GCLOUD_PRIVATE_KEY = parameters['gcloud-sarve-bot-private-key'];
     }
 
     new SarveBot(client);
-    await client.login(discordToken);
+    await client.login(process.env.BOT_TOKEN);
   } catch (err) {
     console.log(err);
   }
