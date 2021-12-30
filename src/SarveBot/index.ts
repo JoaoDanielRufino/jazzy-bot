@@ -97,7 +97,7 @@ export default class SarveBot {
     return connection;
   }
 
-  private initializeVoiceRecoginition(voiceRecognition: VoiceRecognition, guildId: string) {
+  private initializeVoiceRecognition(voiceRecognition: VoiceRecognition, guildId: string) {
     voiceRecognition.on('data', (prediction) =>
       this.handlePrediction.bind(this, prediction.toLowerCase(), this.messageMap.get(guildId)!)()
     );
@@ -132,7 +132,7 @@ export default class SarveBot {
       const voiceConnection = this.createVoiceConnection(voiceChannel);
 
       const voiceRecognition = new VoiceRecognition(voiceConnection);
-      this.initializeVoiceRecoginition(voiceRecognition, guildId);
+      this.initializeVoiceRecognition(voiceRecognition, guildId);
 
       musicPlayer = new MusicPlayer(voiceConnection);
 

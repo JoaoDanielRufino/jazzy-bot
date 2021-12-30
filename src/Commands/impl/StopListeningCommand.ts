@@ -19,7 +19,7 @@ export class StopListeningCommand implements CommandChain {
       return this.nextCommand.processCommand(command, message, subscription);
 
     console.log('Stopped listening on guild:', message.guildId);
-    subscription.voiceRecognition.stopRecognition();
+    subscription.voiceRecognition.stopRecogntion();
 
     const embed = new MessageEmbed().setColor('DARK_ORANGE').setTitle('Stopped listening');
 

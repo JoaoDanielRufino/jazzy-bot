@@ -19,7 +19,7 @@ export class ListenCommand implements CommandChain {
       return this.nextCommand.processCommand(command, message, subscription);
 
     console.log('Started listening voice on guild:', message.guildId);
-    subscription.voiceRecognition.startRecognition();
+    subscription.voiceRecognition.startRecogntion();
 
     const embed = new MessageEmbed()
       .setColor('DARK_ORANGE')

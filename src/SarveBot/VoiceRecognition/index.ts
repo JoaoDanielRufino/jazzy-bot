@@ -50,11 +50,11 @@ export class VoiceRecognition extends TypedEmitter<VoiceRecognitionEvents> {
     this.emit('data', response.results[0].alternatives[0].transcript);
   }
 
-  public startRecognition() {
+  public startRecogntion() {
     this.receiver.speaking.on('start', this.startSpeakingHandler.bind(this));
   }
 
-  public stopRecognition() {
+  public stopRecogntion() {
     this.receiver.speaking.removeAllListeners();
   }
 }
