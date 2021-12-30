@@ -1,9 +1,9 @@
-import { Message } from 'discord.js';
+import { Message, MessageEmbed } from 'discord.js';
 import { Subscription } from '../../SarveBot';
 import { CommandChain } from '../CommandChain';
 import { EmptyCommand } from './EmptyCommand';
 
-export class PlaySambasCommand implements CommandChain {
+export class ListenCommand implements CommandChain {
   private nextCommand: CommandChain;
 
   constructor() {
@@ -15,9 +15,16 @@ export class PlaySambasCommand implements CommandChain {
   }
 
   public async processCommand(command: string, message: Message, subscription: Subscription) {
-    if (command !== 'sambas')
+    if (command !== 'listen')
       return this.nextCommand.processCommand(command, message, subscription);
 
-    await subscription.musicPlayer.playSambaPlaylist();
+    subscription.voiceRecognition.startRecognition();
+
+    const embed = new MessageEmbed()
+      .setColor('DARK_ORANGE')
+      .setTitle('Started listening to commands')
+      .setDescription('You can now say the commands');
+
+    message.channel.send({ embeds: [embed] });
   }
 }

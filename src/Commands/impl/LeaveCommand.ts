@@ -1,5 +1,5 @@
 import { Message } from 'discord.js';
-import { MusicPlayer } from '../../MusicPlayer';
+import { Subscription } from '../../SarveBot';
 import { CommandChain } from '../CommandChain';
 import { EmptyCommand } from './EmptyCommand';
 
@@ -14,9 +14,9 @@ export class LeaveCommand implements CommandChain {
     this.nextCommand = nextCommand;
   }
 
-  public async processCommand(command: string, message: Message, musicPlayer: MusicPlayer) {
-    if (command !== 'leave') return this.nextCommand.processCommand(command, message, musicPlayer);
+  public async processCommand(command: string, message: Message, subscription: Subscription) {
+    if (command !== 'leave') return this.nextCommand.processCommand(command, message, subscription);
 
-    musicPlayer.destroy();
+    subscription.musicPlayer.destroy();
   }
 }

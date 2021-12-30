@@ -14,18 +14,25 @@ import {
   ResumeCommand,
   PauseCommand,
   ClearQueueCommand,
+  ListenCommand,
 } from '../Commands/impl';
+import { VoiceRecognition } from './VoiceRecognition';
+
+export interface Subscription {
+  musicPlayer: MusicPlayer;
+  voiceRecognition: VoiceRecognition;
+}
 
 export default class SarveBot {
   private client: Client;
   private readonly PREFIX = process.env.BOT_PREFIX || 'sarve';
   private commandChain: CommandChain;
-  private subscriptions: Map<string, MusicPlayer>;
+  private subscriptions: Map<string, Subscription>;
 
   constructor(client: Client) {
     this.client = client;
     this.commandChain = this.createCommands();
-    this.subscriptions = new Map<string, MusicPlayer>();
+    this.subscriptions = new Map<string, Subscription>();
 
     this.client.on('ready', () => console.log('Bot ready'));
     this.client.on('messageCreate', this.onMessageCreate.bind(this));
@@ -42,6 +49,7 @@ export default class SarveBot {
     const pauseCommand = new PauseCommand();
     const resumeCommand = new ResumeCommand();
     const clearQueueCommand = new ClearQueueCommand();
+    const listenCommand = new ListenCommand();
     const emptyCommand = new EmptyCommand();
 
     sambaCommand.setNext(sambaPlaylistCommand);
@@ -53,7 +61,8 @@ export default class SarveBot {
     pauseCommand.setNext(resumeCommand);
     resumeCommand.setNext(clearQueueCommand);
     clearQueueCommand.setNext(leaveCommand);
-    leaveCommand.setNext(emptyCommand);
+    leaveCommand.setNext(listenCommand);
+    listenCommand.setNext(emptyCommand);
 
     return sambaCommand;
   }
@@ -63,11 +72,12 @@ export default class SarveBot {
       channelId: voiceChannel.id,
       guildId: voiceChannel.guildId,
       adapterCreator: voiceChannel.guild.voiceAdapterCreator,
+      selfDeaf: false,
     });
 
     connection.on('stateChange', (_, newState) => {
       if (newState.status === VoiceConnectionStatus.Disconnected) {
-        this.subscriptions.get(voiceChannel.guildId)!.destroy();
+        this.subscriptions.get(voiceChannel.guildId)!.musicPlayer.destroy();
         this.subscriptions.delete(voiceChannel.guildId);
         console.log(`Disconnected from ${voiceChannel.guildId} - ${voiceChannel.guild.name}`);
       } else if (
@@ -93,19 +103,20 @@ export default class SarveBot {
     const guildId = message.guildId!;
     let musicPlayer: MusicPlayer;
     if (this.subscriptions.has(guildId)) {
-      musicPlayer = this.subscriptions.get(guildId)!;
+      musicPlayer = this.subscriptions.get(guildId)!.musicPlayer;
     } else {
       const voiceChannel = message.member!.voice.channel;
       const voiceConnection = this.createVoiceConnection(voiceChannel);
 
+      const voiceRecognition = new VoiceRecognition(voiceConnection);
       musicPlayer = new MusicPlayer(voiceConnection);
 
-      this.subscriptions.set(guildId, musicPlayer);
+      this.subscriptions.set(guildId, { musicPlayer, voiceRecognition });
     }
 
     musicPlayer.setMessage(message);
 
     const command = message.content.substr(this.PREFIX.length + 1);
-    this.commandChain.processCommand(command, message, musicPlayer);
+    this.commandChain.processCommand(command, message, this.subscriptions.get(guildId)!);
   }
 }
