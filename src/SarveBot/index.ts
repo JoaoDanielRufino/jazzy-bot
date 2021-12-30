@@ -95,15 +95,9 @@ export default class SarveBot {
       const voiceChannel = message.member!.voice.channel;
       const voiceConnection = this.createVoiceConnection(voiceChannel);
 
-      voiceConnection.receiver.speaking.on('start', (userId) => {
-        console.log('Started speaking', userId);
-      });
-
-      voiceConnection.receiver.speaking.on('end', (userId) => {
-        console.log('Ended speaking', userId);
-      });
-
       musicPlayer = new MusicPlayer(voiceConnection);
+
+      this.subscriptions.set(guildId, musicPlayer);
     }
 
     musicPlayer.setMessage(message);
