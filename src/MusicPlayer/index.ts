@@ -102,7 +102,6 @@ export class MusicPlayer {
       )
     );
 
-    console.log(`Playing ${nextSong.title}`);
     this.message?.channel.send({ embeds: [this.embedMessages.playingInfoEmbed(nextSong)] });
   }
 

@@ -1,6 +1,7 @@
 import { Client, Message, StageChannel, VoiceChannel } from 'discord.js';
 import { joinVoiceChannel, VoiceConnectionStatus } from '@discordjs/voice';
 import { MusicPlayer } from '../MusicPlayer';
+import { VoiceRecognition } from './VoiceRecognition';
 import { CommandChain } from '../Commands/CommandChain';
 import {
   PlaySambaCommand,
@@ -17,7 +18,6 @@ import {
   ListenCommand,
   StopListeningCommand,
 } from '../Commands/impl';
-import { VoiceRecognition } from './VoiceRecognition';
 
 export interface Subscription {
   musicPlayer: MusicPlayer;
@@ -29,11 +29,13 @@ export default class SarveBot {
   private readonly PREFIX = process.env.BOT_PREFIX || 'sarve';
   private commandChain: CommandChain;
   private subscriptions: Map<string, Subscription>;
+  private messageMap: Map<string, Message>;
 
   constructor(client: Client) {
     this.client = client;
     this.commandChain = this.createCommands();
     this.subscriptions = new Map<string, Subscription>();
+    this.messageMap = new Map<string, Message>();
 
     this.client.on('ready', () => console.log('Bot ready'));
     this.client.on('messageCreate', this.onMessageCreate.bind(this));
@@ -95,9 +97,9 @@ export default class SarveBot {
     return connection;
   }
 
-  private initializeVoiceRecoginition(voiceRecognition: VoiceRecognition, message: Message) {
+  private initializeVoiceRecoginition(voiceRecognition: VoiceRecognition, guildId: string) {
     voiceRecognition.on('data', (prediction) =>
-      this.handlePrediction.bind(this, prediction.toLowerCase(), message)()
+      this.handlePrediction.bind(this, prediction.toLowerCase(), this.messageMap.get(guildId)!)()
     );
 
     voiceRecognition.on('error', (err) => console.log(err));
@@ -120,6 +122,8 @@ export default class SarveBot {
     }
 
     const guildId = message.guildId!;
+    this.messageMap.set(guildId, message);
+
     let musicPlayer: MusicPlayer;
     if (this.subscriptions.has(guildId)) {
       musicPlayer = this.subscriptions.get(guildId)!.musicPlayer;
@@ -128,7 +132,7 @@ export default class SarveBot {
       const voiceConnection = this.createVoiceConnection(voiceChannel);
 
       const voiceRecognition = new VoiceRecognition(voiceConnection);
-      this.initializeVoiceRecoginition(voiceRecognition, message);
+      this.initializeVoiceRecoginition(voiceRecognition, guildId);
 
       musicPlayer = new MusicPlayer(voiceConnection);
 

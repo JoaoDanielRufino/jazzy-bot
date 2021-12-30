@@ -41,7 +41,9 @@ export class VoiceRecognition extends TypedEmitter<VoiceRecognitionEvents> {
 
     const prismDecoder = new prism.opus.Decoder({ channels: 1, rate: 48000, frameSize: 960 });
 
-    pipeline(opusStream, prismDecoder, streamRecognizer, (err) => this.emit('error', err));
+    pipeline(opusStream, prismDecoder, streamRecognizer, (err) => {
+      if (err) this.emit('error', err);
+    });
   }
 
   private handleDataRecognizer(response: any) {
