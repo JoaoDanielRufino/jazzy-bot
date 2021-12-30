@@ -9,6 +9,7 @@ import { PauseCommand } from './PauseCommand';
 import { ResumeCommand } from './ResumeCommand';
 import { ClearQueueCommand } from './ClearQueueCommand';
 import { ListenCommand } from './ListenCommand';
+import { StopListeningCommand } from './StopListeningCommand';
 import { EmptyCommand } from './EmptyCommand';
 
 export {
@@ -23,5 +24,6 @@ export {
   ResumeCommand,
   ClearQueueCommand,
   ListenCommand,
+  StopListeningCommand,
   EmptyCommand,
 };

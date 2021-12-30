@@ -57,4 +57,8 @@ export class VoiceRecognition {
     this.receiver.speaking.on('start', this.startSpeakingHandler.bind(this));
     this.receiver.speaking.on('end', this.endSpeakingHandler.bind(this));
   }
+
+  public stopRecognition() {
+    this.receiver.speaking.removeAllListeners();
+  }
 }

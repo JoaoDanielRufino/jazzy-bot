@@ -15,6 +15,7 @@ import {
   PauseCommand,
   ClearQueueCommand,
   ListenCommand,
+  StopListeningCommand,
 } from '../Commands/impl';
 import { VoiceRecognition } from './VoiceRecognition';
 
@@ -50,6 +51,7 @@ export default class SarveBot {
     const resumeCommand = new ResumeCommand();
     const clearQueueCommand = new ClearQueueCommand();
     const listenCommand = new ListenCommand();
+    const stopListeningCommand = new StopListeningCommand();
     const emptyCommand = new EmptyCommand();
 
     sambaCommand.setNext(sambaPlaylistCommand);
@@ -62,7 +64,8 @@ export default class SarveBot {
     resumeCommand.setNext(clearQueueCommand);
     clearQueueCommand.setNext(leaveCommand);
     leaveCommand.setNext(listenCommand);
-    listenCommand.setNext(emptyCommand);
+    listenCommand.setNext(stopListeningCommand);
+    stopListeningCommand.setNext(emptyCommand);
 
     return sambaCommand;
   }
