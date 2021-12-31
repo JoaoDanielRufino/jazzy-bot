@@ -1,8 +1,8 @@
 {
-  "name": "sarve-bot",
+  "name": "jazzy-bot",
   "version": "1.0.0",
   "main": "index.js",
-  "repository": "git@github.com:JoaoDanielRufino/sarve-bot.git",
+  "repository": "git@github.com:JoaoDanielRufino/jazzy-bot.git",
   "author": "JoaoDanielRufino <joaodaniel0405@gmail.com>",
   "license": "MIT",
   "scripts": {

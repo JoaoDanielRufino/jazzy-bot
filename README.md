@@ -1,4 +1,4 @@
-# Save Bot
+# Jazzy Bot
 
 A funny discord bot that plays brazilian memes and sambas
 
