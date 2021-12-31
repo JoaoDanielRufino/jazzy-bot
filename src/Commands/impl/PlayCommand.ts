@@ -1,8 +1,8 @@
 import { Message } from 'discord.js';
-import { MusicPlayer } from '../../MusicPlayer';
 import { CommandChain } from '../CommandChain';
 import { EmptyCommand } from './EmptyCommand';
 import { YouTubeClient } from '../../YouTubeClient';
+import { Subscription } from '../../JazzyBot';
 
 export class PlayCommand implements CommandChain {
   private nextCommand: CommandChain;
@@ -17,10 +17,11 @@ export class PlayCommand implements CommandChain {
     this.nextCommand = nextCommand;
   }
 
-  public async processCommand(command: string, message: Message, musicPlayer: MusicPlayer) {
+  public async processCommand(command: string, message: Message, subscription: Subscription) {
     if (!command.startsWith('play '))
-      return this.nextCommand.processCommand(command, message, musicPlayer);
+      return this.nextCommand.processCommand(command, message, subscription);
 
+    const { musicPlayer } = subscription;
     if (command.includes('https')) {
       const url = command.split(' ')[1];
       const info = await this.ytClient.getVideoInfoByUrl(url);

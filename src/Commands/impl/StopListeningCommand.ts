@@ -1,9 +1,9 @@
-import { Message } from 'discord.js';
+import { Message, MessageEmbed } from 'discord.js';
 import { Subscription } from '../../JazzyBot';
 import { CommandChain } from '../CommandChain';
 import { EmptyCommand } from './EmptyCommand';
 
-export class ResumeCommand implements CommandChain {
+export class StopListeningCommand implements CommandChain {
   private nextCommand: CommandChain;
 
   constructor() {
@@ -15,9 +15,14 @@ export class ResumeCommand implements CommandChain {
   }
 
   public async processCommand(command: string, message: Message, subscription: Subscription) {
-    if (command !== 'resume')
+    if (command !== 'stop listening')
       return this.nextCommand.processCommand(command, message, subscription);
 
-    subscription.musicPlayer.resumeSong();
+    console.log('Stopped listening on guild:', message.guildId);
+    subscription.voiceRecognition.stopRecogntion();
+
+    const embed = new MessageEmbed().setColor('DARK_ORANGE').setTitle('Stopped listening');
+
+    message.channel.send({ embeds: [embed] });
   }
 }

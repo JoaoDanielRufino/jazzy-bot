@@ -8,6 +8,8 @@ import { LeaveCommand } from './LeaveCommand';
 import { PauseCommand } from './PauseCommand';
 import { ResumeCommand } from './ResumeCommand';
 import { ClearQueueCommand } from './ClearQueueCommand';
+import { ListenCommand } from './ListenCommand';
+import { StopListeningCommand } from './StopListeningCommand';
 import { EmptyCommand } from './EmptyCommand';
 
 export {
@@ -21,5 +23,7 @@ export {
   PauseCommand,
   ResumeCommand,
   ClearQueueCommand,
+  ListenCommand,
+  StopListeningCommand,
   EmptyCommand,
 };
