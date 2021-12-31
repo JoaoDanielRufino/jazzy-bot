@@ -1,7 +1,7 @@
 FROM node:17-alpine
 WORKDIR /app
 
-RUN apk add --no-cache ffmpeg
+RUN apk add --no-cache --update build-base ffmpeg python3
 
 COPY package*.json ./
 COPY yarn.lock ./
