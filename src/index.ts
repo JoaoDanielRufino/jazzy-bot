@@ -1,7 +1,7 @@
 import { Client, Intents } from 'discord.js';
 import { GetParameterCommand, SSMClient } from '@aws-sdk/client-ssm';
 import * as dotenv from 'dotenv';
-import SarveBot from './SarveBot';
+import JazzyBot from './JazzyBot';
 
 dotenv.config();
 
@@ -63,7 +63,7 @@ async function main() {
       process.env.GCLOUD_PRIVATE_KEY = parameters['gcloud-sarve-bot-private-key'];
     }
 
-    new SarveBot(client);
+    new JazzyBot(client);
     await client.login(process.env.BOT_TOKEN);
   } catch (err) {
     console.log(err);

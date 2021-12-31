@@ -24,9 +24,9 @@ export interface Subscription {
   voiceRecognition: VoiceRecognition;
 }
 
-export default class SarveBot {
+export default class JazzyBot {
   private client: Client;
-  private readonly PREFIX = process.env.BOT_PREFIX || 'sarve';
+  private readonly PREFIX = process.env.BOT_PREFIX || 'jazzy';
   private commandChain: CommandChain;
   private subscriptions: Map<string, Subscription>;
   private messageMap: Map<string, Message>;

@@ -1,10 +1,16 @@
 {
   "containerDefinitions": [
     {
-      "name": "sarve-bot",
-      "image": "347857632042.dkr.ecr.us-east-1.amazonaws.com/sarve-bot:v1",
+      "name": "jazzy-bot",
+      "image": "347857632042.dkr.ecr.us-east-1.amazonaws.com/jazzy-bot:latest",
       "cpu": 0,
-      "portMappings": [],
+      "portMappings": [
+        {
+          "containerPort": 80,
+          "hostPort": 80,
+          "protocol": "tcp"
+        }
+      ],
       "essential": true,
       "environment": [],
       "mountPoints": [],
@@ -12,14 +18,14 @@
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": "/ecs/sarve-bot-task-definition",
+          "awslogs-group": "/ecs/jazzy-bot-task-definition",
           "awslogs-region": "us-east-1",
           "awslogs-stream-prefix": "ecs"
         }
       }
     }
   ],
-  "family": "sarve-bot-task-definition",
+  "family": "jazzy-bot-task-definition",
   "taskRoleArn": "arn:aws:iam::347857632042:role/ecsTaskExecutionRole",
   "executionRoleArn": "arn:aws:iam::347857632042:role/ecsTaskExecutionRole",
   "networkMode": "awsvpc",
