@@ -1,5 +1,5 @@
 import { Message } from 'discord.js';
-import { Subscription } from '../SarveBot';
+import { Subscription } from '../JazzyBot';
 
 export interface CommandChain {
   setNext(next: CommandChain): void;

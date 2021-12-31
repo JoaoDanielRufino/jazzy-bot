@@ -1,5 +1,5 @@
 import { Message } from 'discord.js';
-import { Subscription } from '../../SarveBot';
+import { Subscription } from '../../JazzyBot';
 import { CommandChain } from '../CommandChain';
 import { EmptyCommand } from './EmptyCommand';
 

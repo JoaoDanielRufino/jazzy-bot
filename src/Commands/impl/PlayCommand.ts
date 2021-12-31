@@ -2,7 +2,7 @@ import { Message } from 'discord.js';
 import { CommandChain } from '../CommandChain';
 import { EmptyCommand } from './EmptyCommand';
 import { YouTubeClient } from '../../YouTubeClient';
-import { Subscription } from '../../SarveBot';
+import { Subscription } from '../../JazzyBot';
 
 export class PlayCommand implements CommandChain {
   private nextCommand: CommandChain;
