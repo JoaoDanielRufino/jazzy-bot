@@ -28,9 +28,12 @@ export class YouTubeClient {
     const { data } = response;
     const parsedDuration = parse(data.items[0].contentDetails.duration);
 
+    const seconds =
+      parsedDuration.seconds! < 10 ? `0${parsedDuration.seconds}` : parsedDuration.seconds;
+
     data.items[0].contentDetails.duration = parsedDuration.hours
       ? `${parsedDuration.hours}:${parsedDuration.minutes}:${parsedDuration.seconds}`
-      : `${parsedDuration.minutes || 0}:${parsedDuration.seconds}`;
+      : `${parsedDuration.minutes || 0}:${seconds}`;
 
     return data;
   }

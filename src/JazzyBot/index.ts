@@ -107,9 +107,9 @@ export default class JazzyBot {
 
   private handlePrediction(prediction: string, message: Message) {
     console.log({ prediction, guildId: message.guildId });
-    if (!prediction.startsWith('jazzy')) return;
+    if (!prediction.startsWith(this.PREFIX)) return;
 
-    const command = prediction.substr('jazzy'.length + 1);
+    const command = prediction.substr(this.PREFIX.length + 1);
     this.commandChain.processCommand(command, message, this.subscriptions.get(message.guildId!)!);
   }
 
