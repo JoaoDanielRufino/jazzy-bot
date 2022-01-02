@@ -8,8 +8,8 @@ All the commands can be written on the text channel or spoken if the voice recog
 To add the bot to your server, enter the this [url](https://discord.com/oauth2/authorize?client_id=788188036743561226&scope=bot)
 
 ## Commands
-`jazzy listen`: start listening to voice commands
-`jazzy stop listening`: stop listening to voice commands
+`jazzy listen`: start listening to voice commands\
+`jazzy stop listening`: stop listening to voice commands\
 `jazzy play [song name or youtube url]`: plays a song from youtube\
 `jazzy meme`: plays a random meme\
 `jazzy memes`: plays the meme playlist\
