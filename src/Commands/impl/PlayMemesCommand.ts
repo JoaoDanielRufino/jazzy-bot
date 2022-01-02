@@ -5,9 +5,11 @@ import { EmptyCommand } from './EmptyCommand';
 
 export class PlayMemesCommand implements CommandChain {
   private nextCommand: CommandChain;
+  private commands: Set<string>;
 
   constructor() {
     this.nextCommand = new EmptyCommand();
+    this.commands = new Set<string>(['memes']);
   }
 
   public setNext(nextCommand: CommandChain) {
@@ -15,7 +17,8 @@ export class PlayMemesCommand implements CommandChain {
   }
 
   public async processCommand(command: string, message: Message, subscription: Subscription) {
-    if (command !== 'memes') return this.nextCommand.processCommand(command, message, subscription);
+    if (!this.commands.has(command))
+      return this.nextCommand.processCommand(command, message, subscription);
 
     await subscription.musicPlayer.playMemes();
   }

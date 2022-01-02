@@ -5,9 +5,11 @@ import { EmptyCommand } from './EmptyCommand';
 
 export class ListenCommand implements CommandChain {
   private nextCommand: CommandChain;
+  private commands: Set<string>;
 
   constructor() {
     this.nextCommand = new EmptyCommand();
+    this.commands = new Set<string>(['listen']);
   }
 
   public setNext(nextCommand: CommandChain) {
@@ -15,7 +17,7 @@ export class ListenCommand implements CommandChain {
   }
 
   public async processCommand(command: string, message: Message, subscription: Subscription) {
-    if (command !== 'listen')
+    if (!this.commands.has(command))
       return this.nextCommand.processCommand(command, message, subscription);
 
     console.log('Started listening voice on guild:', message.guildId);

@@ -5,9 +5,11 @@ import { EmptyCommand } from './EmptyCommand';
 
 export class StopListeningCommand implements CommandChain {
   private nextCommand: CommandChain;
+  private commands: Set<string>;
 
   constructor() {
     this.nextCommand = new EmptyCommand();
+    this.commands = new Set<string>(['stop listening']);
   }
 
   public setNext(nextCommand: CommandChain) {
@@ -15,7 +17,7 @@ export class StopListeningCommand implements CommandChain {
   }
 
   public async processCommand(command: string, message: Message, subscription: Subscription) {
-    if (command !== 'stop listening')
+    if (!this.commands.has(command))
       return this.nextCommand.processCommand(command, message, subscription);
 
     console.log('Stopped listening on guild:', message.guildId);

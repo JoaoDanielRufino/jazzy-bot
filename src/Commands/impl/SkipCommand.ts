@@ -5,9 +5,11 @@ import { EmptyCommand } from './EmptyCommand';
 
 export class SkipCommand implements CommandChain {
   private nextCommand: CommandChain;
+  private commands: Set<string>;
 
   constructor() {
     this.nextCommand = new EmptyCommand();
+    this.commands = new Set<string>(['skip', 'next song']);
   }
 
   public setNext(nextCommand: CommandChain) {
@@ -15,7 +17,8 @@ export class SkipCommand implements CommandChain {
   }
 
   public async processCommand(command: string, message: Message, subscription: Subscription) {
-    if (command !== 'skip') return this.nextCommand.processCommand(command, message, subscription);
+    if (!this.commands.has(command))
+      return this.nextCommand.processCommand(command, message, subscription);
 
     subscription.musicPlayer.skipSong();
   }
