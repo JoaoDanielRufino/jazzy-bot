@@ -42,34 +42,27 @@ export default class JazzyBot {
   }
 
   private createCommands(): CommandChain {
-    const sambaCommand = new PlaySambaCommand();
-    const sambaPlaylistCommand = new PlaySambasCommand();
-    const memeCommand = new PlayMemeCommand();
-    const memesPlaylistCommand = new PlayMemesCommand();
-    const playCommand = new PlayCommand();
-    const skipCommand = new SkipCommand();
-    const leaveCommand = new LeaveCommand();
-    const pauseCommand = new PauseCommand();
-    const resumeCommand = new ResumeCommand();
-    const clearQueueCommand = new ClearQueueCommand();
-    const listenCommand = new ListenCommand();
-    const stopListeningCommand = new StopListeningCommand();
-    const emptyCommand = new EmptyCommand();
+    const commands: CommandChain[] = [
+      new PlayCommand(),
+      new PlaySambasCommand(),
+      new PlaySambaCommand(),
+      new PlayMemesCommand(),
+      new PlayMemeCommand(),
+      new SkipCommand(),
+      new ListenCommand(),
+      new StopListeningCommand(),
+      new PauseCommand(),
+      new ResumeCommand(),
+      new ClearQueueCommand(),
+      new LeaveCommand(),
+      new EmptyCommand(),
+    ];
 
-    sambaCommand.setNext(sambaPlaylistCommand);
-    sambaPlaylistCommand.setNext(memeCommand);
-    memeCommand.setNext(memesPlaylistCommand);
-    memesPlaylistCommand.setNext(playCommand);
-    playCommand.setNext(skipCommand);
-    skipCommand.setNext(pauseCommand);
-    pauseCommand.setNext(resumeCommand);
-    resumeCommand.setNext(clearQueueCommand);
-    clearQueueCommand.setNext(leaveCommand);
-    leaveCommand.setNext(listenCommand);
-    listenCommand.setNext(stopListeningCommand);
-    stopListeningCommand.setNext(emptyCommand);
+    for (let i = 0; i < commands.length - 1; i++) {
+      commands[i].setNext(commands[i + 1]);
+    }
 
-    return sambaCommand;
+    return commands[0];
   }
 
   private createVoiceConnection(voiceChannel: VoiceChannel | StageChannel) {
