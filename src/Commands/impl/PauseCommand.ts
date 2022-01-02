@@ -5,9 +5,11 @@ import { EmptyCommand } from './EmptyCommand';
 
 export class PauseCommand implements CommandChain {
   private nextCommand: CommandChain;
+  private commands: Set<string>;
 
   constructor() {
     this.nextCommand = new EmptyCommand();
+    this.commands = new Set<string>(['pause', 'stop']);
   }
 
   public setNext(nextCommand: CommandChain) {
@@ -15,7 +17,8 @@ export class PauseCommand implements CommandChain {
   }
 
   public async processCommand(command: string, message: Message, subscription: Subscription) {
-    if (command !== 'pause') return this.nextCommand.processCommand(command, message, subscription);
+    if (!this.commands.has(command))
+      return this.nextCommand.processCommand(command, message, subscription);
 
     subscription.musicPlayer.pauseSong();
   }
