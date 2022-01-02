@@ -55,7 +55,7 @@ export default class JazzyBot {
       new ResumeCommand(),
       new ClearQueueCommand(),
       new LeaveCommand(),
-      new EmptyCommand(),
+      new EmptyCommand(), // EmptyCommand needs to be the last command
     ];
 
     for (let i = 0; i < commands.length - 1; i++) {
