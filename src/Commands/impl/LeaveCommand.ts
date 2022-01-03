@@ -9,7 +9,7 @@ export class LeaveCommand implements CommandChain {
 
   constructor() {
     this.nextCommand = new EmptyCommand();
-    this.commands = new Set<string>(['leave']);
+    this.commands = new Set<string>(['leave', 'disconnect']);
   }
 
   public setNext(nextCommand: CommandChain) {
