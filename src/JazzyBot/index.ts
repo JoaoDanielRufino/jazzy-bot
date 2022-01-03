@@ -1,4 +1,4 @@
-import { Client, Message, StageChannel, VoiceChannel } from 'discord.js';
+import { Client, Message, StageChannel, VoiceChannel, VoiceState } from 'discord.js';
 import { joinVoiceChannel, VoiceConnectionStatus } from '@discordjs/voice';
 import { MusicPlayer } from '../MusicPlayer';
 import { VoiceRecognition } from './VoiceRecognition';
@@ -39,6 +39,7 @@ export default class JazzyBot {
 
     this.client.on('ready', () => console.log('Bot ready'));
     this.client.on('messageCreate', this.onMessageCreate.bind(this));
+    this.client.on('voiceStateUpdate', this.handleVoiceStateUpdate.bind(this));
   }
 
   private createCommands(): CommandChain {
@@ -74,14 +75,7 @@ export default class JazzyBot {
     });
 
     connection.on('stateChange', (_, newState) => {
-      if (newState.status === VoiceConnectionStatus.Disconnected) {
-        this.subscriptions.get(voiceChannel.guildId)!.musicPlayer.destroy();
-        this.subscriptions.delete(voiceChannel.guildId);
-        console.log(`Disconnected from ${voiceChannel.guildId} - ${voiceChannel.guild.name}`);
-      } else if (
-        newState.status === VoiceConnectionStatus.Destroyed &&
-        this.subscriptions.has(voiceChannel.guildId)
-      ) {
+      if (newState.status === VoiceConnectionStatus.Destroyed) {
         this.subscriptions.delete(voiceChannel.guildId);
         console.log(`Disconnected from ${voiceChannel.guildId} - ${voiceChannel.guild.name}`);
       }
@@ -136,5 +130,13 @@ export default class JazzyBot {
 
     const command = message.content.substr(this.PREFIX.length + 1);
     this.commandChain.processCommand(command, message, this.subscriptions.get(guildId)!);
+  }
+
+  public handleVoiceStateUpdate(oldState: VoiceState, newState: VoiceState) {
+    if (oldState.channel && oldState.channel.members.size === 1 && !newState.channel) {
+      if (!this.subscriptions.has(oldState.channel.guildId)) return;
+      const { musicPlayer } = this.subscriptions.get(oldState.channel.guildId)!;
+      musicPlayer.destroy();
+    }
   }
 }
