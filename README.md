@@ -4,7 +4,7 @@ A discord bot that has voice recognition that listen to voice commands to play m
 
 All the commands can be written on the text channel or spoken if the voice recognition is enabled. This feature removes the necessity of `alt+tab` to enter discord and type the bot command, you just need to say te disered command.
 
-## Intallation
+## Installation
 To add the bot to your server, enter the this [url](https://discord.com/oauth2/authorize?client_id=788188036743561226&scope=bot)
 
 ## Commands
