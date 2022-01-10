@@ -30,9 +30,8 @@ export class PlayCommand implements CommandChain {
   }
 
   private async searchAndPlayVideo(query: string, musicPlayer: MusicPlayer) {
-    const searchResponse = await this.ytClient.search({ q: query, maxResults: 10 });
-    const videos = searchResponse.items.filter((item) => item.id.kind.includes('video'));
-    const firstSearch = videos[0];
+    const searchResponse = await this.ytClient.search({ q: query, maxResults: 3, type: 'video' });
+    const firstSearch = searchResponse.items[0];
 
     const videoInfo = await this.ytClient.getVideoInfoById(firstSearch.id.videoId);
 

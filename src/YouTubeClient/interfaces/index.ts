@@ -57,6 +57,7 @@ interface VideoInfoItem {
 export interface SearchRequest {
   q: string;
   maxResults: number;
+  type?: 'channel' | 'playlist' | 'video';
 }
 
 export interface SearchResponse {
