@@ -110,12 +110,12 @@ export class MusicPlayer {
   }
 
   public async playPlaylist(urlVideos: string[]) {
-    const videoInfosPromises = urlVideos.map((video) => this.ytClient.getVideoInfoByUrl(video));
-    const videoInfos = await Promise.all(videoInfosPromises);
-
     this.message?.channel.send({
       embeds: [this.embedMessages.loadingPlaylist(urlVideos.length)],
     });
+
+    const videoInfosPromises = urlVideos.map((video) => this.ytClient.getVideoInfoByUrl(video));
+    const videoInfos = await Promise.all(videoInfosPromises);
 
     this.lockEnqueueMessage = true;
     videoInfos.forEach((videoInfo) => this.queue.push(parseVideoInfo(videoInfo)));
