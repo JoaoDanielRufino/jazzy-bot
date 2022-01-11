@@ -28,7 +28,6 @@ export class MusicPlayer {
   private queue: Queue<SongInfo>;
   private lockPushEvent: boolean;
   private lockEnqueueMessage: boolean;
-  private isPlaying: boolean;
   private embedMessages: MusicPlayerEmbeds;
   private ytClient: YouTubeClient;
 
@@ -38,7 +37,6 @@ export class MusicPlayer {
     this.queue = new Queue();
     this.lockPushEvent = false;
     this.lockEnqueueMessage = false;
-    this.isPlaying = false;
     this.embedMessages = new MusicPlayerEmbeds();
     this.ytClient = new YouTubeClient(process.env.YOUTUBE_API!);
 
@@ -52,10 +50,8 @@ export class MusicPlayer {
     if (newState.status !== AudioPlayerStatus.Idle) this.lockPushEvent = true;
     else this.lockPushEvent = false;
 
-    if (newState.status === AudioPlayerStatus.Playing) {
+    if (newState.status === AudioPlayerStatus.Playing)
       console.log('Playing', newState.resource.metadata);
-      this.isPlaying = true;
-    } else this.isPlaying = false;
 
     if (
       oldState.status === AudioPlayerStatus.Playing &&
@@ -72,7 +68,7 @@ export class MusicPlayer {
   }
 
   private handleQueuePush(song: SongInfo) {
-    if (this.isPlaying && !this.lockEnqueueMessage)
+    if (this.audioPlayer.state.status === AudioPlayerStatus.Playing && !this.lockEnqueueMessage)
       this.message?.channel.send({
         embeds: [this.embedMessages.enqueueSongEmbed(song, this.queue.size())],
       });
