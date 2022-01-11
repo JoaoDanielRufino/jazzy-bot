@@ -109,6 +109,19 @@ export class MusicPlayer {
     this.queue.push(song);
   }
 
+  public async playPlaylist(urlVideos: string[]) {
+    const videoInfosPromises = urlVideos.map((video) => this.ytClient.getVideoInfoByUrl(video));
+    const videoInfos = await Promise.all(videoInfosPromises);
+
+    this.message?.channel.send({
+      embeds: [this.embedMessages.loadingPlaylist(urlVideos.length)],
+    });
+
+    this.lockEnqueueMessage = true;
+    videoInfos.forEach((videoInfo) => this.queue.push(parseVideoInfo(videoInfo)));
+    this.lockEnqueueMessage = false;
+  }
+
   public async playSamba() {
     const sambaIndex = randomIndex(this.sambas);
     const videoInfo = await this.ytClient.getVideoInfoByUrl(this.sambas[sambaIndex]);

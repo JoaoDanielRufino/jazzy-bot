@@ -40,6 +40,13 @@ export class MusicPlayerEmbeds {
     return new MessageEmbed().setColor(this.COLOR).setTitle('Queue is now empty!');
   }
 
+  public loadingPlaylist(numberOfSongs: number) {
+    return new MessageEmbed()
+      .setColor(this.COLOR)
+      .setTitle('Loading playlist...')
+      .setFields({ name: 'Number of songs', value: numberOfSongs.toString() });
+  }
+
   public loadingSambaPlaylist(numberOfSongs: number) {
     return new MessageEmbed()
       .setColor(this.COLOR)

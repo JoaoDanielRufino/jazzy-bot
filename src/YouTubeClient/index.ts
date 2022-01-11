@@ -1,7 +1,12 @@
 import axios, { AxiosInstance } from 'axios';
 import queryString from 'query-string';
 import { parse } from 'tinyduration';
-import { SearchRequest, SearchResponse, VideoInfoResponse } from './interfaces';
+import {
+  PlaylistInfoResponse,
+  SearchRequest,
+  SearchResponse,
+  VideoInfoResponse,
+} from './interfaces';
 
 export class YouTubeClient {
   private apiKey: string;
@@ -26,6 +31,7 @@ export class YouTubeClient {
     );
 
     const { data } = response;
+    console.log(videoId, data);
     const parsedDuration = parse(data.items[0].contentDetails.duration);
 
     let seconds = '00';
@@ -60,5 +66,22 @@ export class YouTubeClient {
     const parsedUrl = queryString.parseUrl(url);
     const videoId = parsedUrl.query['v'] as string;
     return await this.videoInfo(videoId);
+  }
+
+  public async getPlaylistInfo(url: string): Promise<PlaylistInfoResponse> {
+    const parsedUrl = queryString.parseUrl(url);
+    const playlistId = parsedUrl.query['list'];
+    const params = {
+      key: this.apiKey,
+      part: 'snippet',
+      maxResults: 50,
+      playlistId,
+    };
+
+    const response = await this.api.get<PlaylistInfoResponse>(
+      `/playlistItems?${queryString.stringify(params)}`
+    );
+
+    return response.data;
   }
 }
