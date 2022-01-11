@@ -9,9 +9,7 @@ import {
   VoiceConnection,
 } from '@discordjs/voice';
 import ytdl from 'ytdl-core';
-import sambasPlaylist from './playlists/sambas.json';
-import memesPlaylist from './playlists/memes.json';
-import { parseVideoInfo, randomIndex, shuffle } from './utils';
+import { parseVideoInfo } from '../utils';
 import { Queue } from './Queue';
 import { MusicPlayerEmbeds } from './MusicPlayerEmbeds';
 import { YouTubeClient } from '../YouTubeClient';
@@ -27,8 +25,6 @@ export class MusicPlayer {
   private connection: VoiceConnection;
   private message?: Message;
   private audioPlayer: AudioPlayer;
-  private sambas: string[];
-  private memes: string[];
   private queue: Queue<SongInfo>;
   private lockPushEvent: boolean;
   private lockEnqueueMessage: boolean;
@@ -39,8 +35,6 @@ export class MusicPlayer {
   constructor(connection: VoiceConnection) {
     this.audioPlayer = createAudioPlayer();
     this.connection = connection;
-    this.sambas = sambasPlaylist.map((samba) => samba.url);
-    this.memes = memesPlaylist.map((meme) => meme.url);
     this.queue = new Queue();
     this.lockPushEvent = false;
     this.lockEnqueueMessage = false;
@@ -105,8 +99,9 @@ export class MusicPlayer {
     this.message?.channel.send({ embeds: [this.embedMessages.playingInfoEmbed(nextSong)] });
   }
 
-  public play(song: SongInfo) {
-    this.queue.push(song);
+  public async play(url: string) {
+    const songInfo = await this.ytClient.getVideoInfoByUrl(url);
+    this.queue.push(parseVideoInfo(songInfo));
   }
 
   public async playPlaylist(urlVideos: string[]) {
@@ -115,48 +110,6 @@ export class MusicPlayer {
     });
 
     const videoInfosPromises = urlVideos.map((video) => this.ytClient.getVideoInfoByUrl(video));
-    const videoInfos = await Promise.all(videoInfosPromises);
-
-    this.lockEnqueueMessage = true;
-    videoInfos.forEach((videoInfo) => this.queue.push(parseVideoInfo(videoInfo)));
-    this.lockEnqueueMessage = false;
-  }
-
-  public async playSamba() {
-    const sambaIndex = randomIndex(this.sambas);
-    const videoInfo = await this.ytClient.getVideoInfoByUrl(this.sambas[sambaIndex]);
-    this.queue.push(parseVideoInfo(videoInfo));
-  }
-
-  public async playSambaPlaylist() {
-    this.message?.channel.send({
-      embeds: [this.embedMessages.loadingSambaPlaylist(this.sambas.length)],
-    });
-
-    this.sambas = shuffle(this.sambas);
-
-    const videoInfosPromises = this.sambas.map((samba) => this.ytClient.getVideoInfoByUrl(samba));
-    const videoInfos = await Promise.all(videoInfosPromises);
-
-    this.lockEnqueueMessage = true;
-    videoInfos.forEach((videoInfo) => this.queue.push(parseVideoInfo(videoInfo)));
-    this.lockEnqueueMessage = false;
-  }
-
-  public async playMeme() {
-    const memeIndex = randomIndex(this.memes);
-    const videoInfo = await this.ytClient.getVideoInfoByUrl(this.memes[memeIndex]);
-    this.queue.push(parseVideoInfo(videoInfo));
-  }
-
-  public async playMemes() {
-    this.message?.channel.send({
-      embeds: [this.embedMessages.loadingMemePlaylist(this.memes.length)],
-    });
-
-    this.memes = shuffle(this.memes);
-
-    const videoInfosPromises = this.memes.map((meme) => this.ytClient.getVideoInfoByUrl(meme));
     const videoInfos = await Promise.all(videoInfosPromises);
 
     this.lockEnqueueMessage = true;

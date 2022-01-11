@@ -46,18 +46,4 @@ export class MusicPlayerEmbeds {
       .setTitle('Loading playlist...')
       .setFields({ name: 'Number of songs', value: numberOfSongs.toString() });
   }
-
-  public loadingSambaPlaylist(numberOfSongs: number) {
-    return new MessageEmbed()
-      .setColor(this.COLOR)
-      .setTitle('Loading samba playlist...')
-      .setFields({ name: 'Number of songs', value: numberOfSongs.toString() });
-  }
-
-  public loadingMemePlaylist(numberOfSongs: number) {
-    return new MessageEmbed()
-      .setColor(this.COLOR)
-      .setTitle('Loading meme playlist...')
-      .setFields({ name: 'Number of songs', value: numberOfSongs.toString() });
-  }
 }
