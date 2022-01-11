@@ -31,7 +31,6 @@ export class YouTubeClient {
     );
 
     const { data } = response;
-    console.log(videoId, data);
     const parsedDuration = parse(data.items[0].contentDetails.duration);
 
     let seconds = '00';
