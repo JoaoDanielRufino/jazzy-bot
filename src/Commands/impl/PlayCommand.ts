@@ -43,6 +43,15 @@ export class PlayCommand implements CommandChain {
     });
   }
 
+  private async getInfoAndPlayPlaylist(url: string, musicPlayer: MusicPlayer) {
+    const playlists = await this.ytClient.getPlaylistInfo(url);
+    const urlVideos = playlists.items
+      .filter((item) => item.snippet.description !== 'This video is unavailable.')
+      .map((item) => `https://www.youtube.com/watch?v=${item.snippet.resourceId.videoId}`);
+
+    musicPlayer.playPlaylist(urlVideos);
+  }
+
   public async processCommand(command: string, message: Message, subscription: Subscription) {
     if (!command.startsWith('play '))
       return this.nextCommand.processCommand(command, message, subscription);
@@ -59,10 +68,7 @@ export class PlayCommand implements CommandChain {
     if (command.includes('https://www.youtube.com')) {
       const url = command.split(' ')[1];
       if (url.includes('list=')) {
-        const embed = new MessageEmbed()
-          .setColor('DARK_ORANGE')
-          .setTitle('Playlists are not supported yet');
-        await message.channel.send({ embeds: [embed] });
+        this.getInfoAndPlayPlaylist(url, musicPlayer);
       } else {
         this.getInfoAndPlayVideo(url, musicPlayer);
       }

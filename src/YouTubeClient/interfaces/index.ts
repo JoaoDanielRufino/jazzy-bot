@@ -27,6 +27,23 @@ interface Snippet {
   publishTime: string;
 }
 
+interface PlaylistSnippet {
+  publishedAt: string;
+  channelId: string;
+  title: string;
+  description: string;
+  thumbnails: Thumbnails;
+  channelTitle: string;
+  playlistId: string;
+  position: number;
+  resourceId: {
+    kind: string;
+    videoId: string;
+  };
+  videoOwnerChannelTitle: string;
+  videoOwnerChannelId: string;
+}
+
 interface SearchItem {
   kind: string;
   etag: string;
@@ -54,6 +71,13 @@ interface VideoInfoItem {
   contentDetails: ContentDetails;
 }
 
+interface PlaylistInfoItem {
+  kind: string;
+  etag: string;
+  id: string;
+  snippet: PlaylistSnippet;
+}
+
 export interface SearchRequest {
   q: string;
   maxResults: number;
@@ -66,8 +90,8 @@ export interface SearchResponse {
   nextPageToken: string;
   regionCode: string;
   pageinfo: {
-    totalresults: number;
-    resultsperpage: number;
+    totalResults: number;
+    resultsPerPage: number;
   };
   items: SearchItem[];
 }
@@ -77,7 +101,18 @@ export interface VideoInfoResponse {
   etag: string;
   items: VideoInfoItem[];
   pageinfo: {
-    totalresults: number;
-    resultsperpage: number;
+    totalResults: number;
+    resultsPerPage: number;
+  };
+}
+
+export interface PlaylistInfoResponse {
+  kind: string;
+  etag: string;
+  nextPageToken: string;
+  items: PlaylistInfoItem[];
+  pageinfo: {
+    totalResults: number;
+    resultsPerPage: number;
   };
 }
