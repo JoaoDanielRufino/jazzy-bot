@@ -114,9 +114,17 @@ export class MusicPlayer {
   }
 
   public skipSong() {
-    this.audioPlayer.stop();
-    this.message?.channel.send({ embeds: [this.embedMessages.skipSongEmbed()] });
-    this.processQueue();
+    if (this.audioPlayer.state.status === AudioPlayerStatus.Playing) {
+      this.audioPlayer.stop();
+      this.message?.channel.send({
+        embeds: [this.embedMessages.genericMessage('Skipping song...')],
+      });
+      this.processQueue();
+    } else {
+      this.message?.channel.send({
+        embeds: [this.embedMessages.genericMessage('No music playing')],
+      });
+    }
   }
 
   public pauseSong() {
@@ -128,8 +136,16 @@ export class MusicPlayer {
   }
 
   public clearQueue() {
-    this.queue.clear();
-    this.message?.channel.send({ embeds: [this.embedMessages.clearQueueEmbed()] });
+    if (!this.queue.empty()) {
+      this.queue.clear();
+      this.message?.channel.send({
+        embeds: [this.embedMessages.genericMessage('Queue is now empty')],
+      });
+    } else {
+      this.message?.channel.send({
+        embeds: [this.embedMessages.genericMessage('Queue is already empty')],
+      });
+    }
   }
 
   public destroy() {
