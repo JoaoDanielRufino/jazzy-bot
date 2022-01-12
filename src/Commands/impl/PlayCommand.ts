@@ -4,7 +4,6 @@ import { EmptyCommand } from './EmptyCommand';
 import { YouTubeClient } from '../../YouTubeClient';
 import { Subscription } from '../../JazzyBot';
 import { MusicPlayer } from '../../MusicPlayer';
-import { decode } from 'html-entities';
 
 export class PlayCommand implements CommandChain {
   private nextCommand: CommandChain;
@@ -19,34 +18,21 @@ export class PlayCommand implements CommandChain {
     this.nextCommand = nextCommand;
   }
 
-  private async getInfoAndPlayVideo(url: string, musicPlayer: MusicPlayer) {
-    const info = await this.ytClient.getVideoInfoByUrl(url);
-    musicPlayer.play({
-      url,
-      title: decode(info.items[0].snippet.title),
-      thumbnail: info.items[0].snippet.thumbnails.default.url,
-      duration: info.items[0].contentDetails.duration,
-    });
-  }
-
   private async searchAndPlayVideo(query: string, musicPlayer: MusicPlayer) {
     const searchResponse = await this.ytClient.search({ q: query, maxResults: 3, type: 'video' });
     const firstSearch = searchResponse.items[0];
 
-    const videoInfo = await this.ytClient.getVideoInfoById(firstSearch.id.videoId);
-
-    musicPlayer.play({
-      url: `https://youtube.com/watch?v=${firstSearch.id.videoId}`,
-      title: decode(firstSearch.snippet.title),
-      thumbnail: firstSearch.snippet.thumbnails.default.url,
-      duration: videoInfo.items[0].contentDetails.duration,
-    });
+    musicPlayer.play(`https://youtube.com/watch?v=${firstSearch.id.videoId}`);
   }
 
   private async getInfoAndPlayPlaylist(url: string, musicPlayer: MusicPlayer) {
-    const playlists = await this.ytClient.getPlaylistInfo(url);
-    const urlVideos = playlists.items
-      .filter((item) => item.snippet.description !== 'This video is unavailable.')
+    const playlist = await this.ytClient.getPlaylistInfo(url);
+    const urlVideos = playlist.items
+      .filter(
+        (item) =>
+          item.snippet.description !== 'This video is unavailable.' &&
+          item.snippet.description !== 'This video is private.'
+      )
       .map((item) => `https://www.youtube.com/watch?v=${item.snippet.resourceId.videoId}`);
 
     musicPlayer.playPlaylist(urlVideos);
@@ -70,7 +56,7 @@ export class PlayCommand implements CommandChain {
       if (url.includes('list=')) {
         this.getInfoAndPlayPlaylist(url, musicPlayer);
       } else {
-        this.getInfoAndPlayVideo(url, musicPlayer);
+        musicPlayer.play(url);
       }
     } else {
       const query = command.split('play ')[1];

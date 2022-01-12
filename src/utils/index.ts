@@ -1,5 +1,5 @@
-import { SongInfo } from '..';
-import { VideoInfoResponse } from '../../YouTubeClient/interfaces';
+import { SongInfo } from '../MusicPlayer';
+import { VideoInfoResponse } from '../YouTubeClient/interfaces';
 import { decode } from 'html-entities';
 
 export function shuffle(arr: Array<any>) {

@@ -26,11 +26,9 @@ export class YouTubeClient {
       id: videoId,
     };
 
-    const response = await this.api.get<VideoInfoResponse>(
+    const { data } = await this.api.get<VideoInfoResponse>(
       `/videos?${queryString.stringify(params)}`
     );
-
-    const { data } = response;
     const parsedDuration = parse(data.items[0].contentDetails.duration);
 
     let seconds = '00';
@@ -77,10 +75,19 @@ export class YouTubeClient {
       playlistId,
     };
 
-    const response = await this.api.get<PlaylistInfoResponse>(
+    let { data } = await this.api.get<PlaylistInfoResponse>(
       `/playlistItems?${queryString.stringify(params)}`
     );
+    const playlists = data;
 
-    return response.data;
+    while (data?.nextPageToken) {
+      const response = await this.api.get<PlaylistInfoResponse>(
+        `/playlistItems?${queryString.stringify({ ...params, pageToken: data.nextPageToken })}`
+      );
+      data = response.data;
+      playlists.items.push(...data.items);
+    }
+
+    return playlists;
   }
 }

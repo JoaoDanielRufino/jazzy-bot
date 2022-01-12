@@ -9,9 +9,7 @@ import {
   VoiceConnection,
 } from '@discordjs/voice';
 import ytdl from 'ytdl-core';
-import sambasPlaylist from './playlists/sambas.json';
-import memesPlaylist from './playlists/memes.json';
-import { parseVideoInfo, randomIndex, shuffle } from './utils';
+import { parseVideoInfo } from '../utils';
 import { Queue } from './Queue';
 import { MusicPlayerEmbeds } from './MusicPlayerEmbeds';
 import { YouTubeClient } from '../YouTubeClient';
@@ -27,24 +25,18 @@ export class MusicPlayer {
   private connection: VoiceConnection;
   private message?: Message;
   private audioPlayer: AudioPlayer;
-  private sambas: string[];
-  private memes: string[];
   private queue: Queue<SongInfo>;
   private lockPushEvent: boolean;
   private lockEnqueueMessage: boolean;
-  private isPlaying: boolean;
   private embedMessages: MusicPlayerEmbeds;
   private ytClient: YouTubeClient;
 
   constructor(connection: VoiceConnection) {
     this.audioPlayer = createAudioPlayer();
     this.connection = connection;
-    this.sambas = sambasPlaylist.map((samba) => samba.url);
-    this.memes = memesPlaylist.map((meme) => meme.url);
     this.queue = new Queue();
     this.lockPushEvent = false;
     this.lockEnqueueMessage = false;
-    this.isPlaying = false;
     this.embedMessages = new MusicPlayerEmbeds();
     this.ytClient = new YouTubeClient(process.env.YOUTUBE_API!);
 
@@ -58,10 +50,8 @@ export class MusicPlayer {
     if (newState.status !== AudioPlayerStatus.Idle) this.lockPushEvent = true;
     else this.lockPushEvent = false;
 
-    if (newState.status === AudioPlayerStatus.Playing) {
+    if (newState.status === AudioPlayerStatus.Playing)
       console.log('Playing', newState.resource.metadata);
-      this.isPlaying = true;
-    } else this.isPlaying = false;
 
     if (
       oldState.status === AudioPlayerStatus.Playing &&
@@ -78,7 +68,7 @@ export class MusicPlayer {
   }
 
   private handleQueuePush(song: SongInfo) {
-    if (this.isPlaying && !this.lockEnqueueMessage)
+    if (this.audioPlayer.state.status === AudioPlayerStatus.Playing && !this.lockEnqueueMessage)
       this.message?.channel.send({
         embeds: [this.embedMessages.enqueueSongEmbed(song, this.queue.size())],
       });
@@ -105,8 +95,9 @@ export class MusicPlayer {
     this.message?.channel.send({ embeds: [this.embedMessages.playingInfoEmbed(nextSong)] });
   }
 
-  public play(song: SongInfo) {
-    this.queue.push(song);
+  public async play(url: string) {
+    const songInfo = await this.ytClient.getVideoInfoByUrl(url);
+    this.queue.push(parseVideoInfo(songInfo));
   }
 
   public async playPlaylist(urlVideos: string[]) {
@@ -122,52 +113,18 @@ export class MusicPlayer {
     this.lockEnqueueMessage = false;
   }
 
-  public async playSamba() {
-    const sambaIndex = randomIndex(this.sambas);
-    const videoInfo = await this.ytClient.getVideoInfoByUrl(this.sambas[sambaIndex]);
-    this.queue.push(parseVideoInfo(videoInfo));
-  }
-
-  public async playSambaPlaylist() {
-    this.message?.channel.send({
-      embeds: [this.embedMessages.loadingSambaPlaylist(this.sambas.length)],
-    });
-
-    this.sambas = shuffle(this.sambas);
-
-    const videoInfosPromises = this.sambas.map((samba) => this.ytClient.getVideoInfoByUrl(samba));
-    const videoInfos = await Promise.all(videoInfosPromises);
-
-    this.lockEnqueueMessage = true;
-    videoInfos.forEach((videoInfo) => this.queue.push(parseVideoInfo(videoInfo)));
-    this.lockEnqueueMessage = false;
-  }
-
-  public async playMeme() {
-    const memeIndex = randomIndex(this.memes);
-    const videoInfo = await this.ytClient.getVideoInfoByUrl(this.memes[memeIndex]);
-    this.queue.push(parseVideoInfo(videoInfo));
-  }
-
-  public async playMemes() {
-    this.message?.channel.send({
-      embeds: [this.embedMessages.loadingMemePlaylist(this.memes.length)],
-    });
-
-    this.memes = shuffle(this.memes);
-
-    const videoInfosPromises = this.memes.map((meme) => this.ytClient.getVideoInfoByUrl(meme));
-    const videoInfos = await Promise.all(videoInfosPromises);
-
-    this.lockEnqueueMessage = true;
-    videoInfos.forEach((videoInfo) => this.queue.push(parseVideoInfo(videoInfo)));
-    this.lockEnqueueMessage = false;
-  }
-
   public skipSong() {
-    this.audioPlayer.stop();
-    this.message?.channel.send({ embeds: [this.embedMessages.skipSongEmbed()] });
-    this.processQueue();
+    if (this.audioPlayer.state.status === AudioPlayerStatus.Playing) {
+      this.audioPlayer.stop();
+      this.message?.channel.send({
+        embeds: [this.embedMessages.genericMessage('Skipping song...')],
+      });
+      this.processQueue();
+    } else {
+      this.message?.channel.send({
+        embeds: [this.embedMessages.genericMessage('No music playing')],
+      });
+    }
   }
 
   public pauseSong() {
@@ -179,8 +136,16 @@ export class MusicPlayer {
   }
 
   public clearQueue() {
-    this.queue.clear();
-    this.message?.channel.send({ embeds: [this.embedMessages.clearQueueEmbed()] });
+    if (!this.queue.empty()) {
+      this.queue.clear();
+      this.message?.channel.send({
+        embeds: [this.embedMessages.genericMessage('Queue is now empty')],
+      });
+    } else {
+      this.message?.channel.send({
+        embeds: [this.embedMessages.genericMessage('Queue is already empty')],
+      });
+    }
   }
 
   public destroy() {
