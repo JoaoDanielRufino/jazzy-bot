@@ -4,7 +4,6 @@ import { EmptyCommand } from './EmptyCommand';
 import { YouTubeClient } from '../../YouTubeClient';
 import { Subscription } from '../../JazzyBot';
 import { MusicPlayer } from '../../MusicPlayer';
-import { decode } from 'html-entities';
 
 export class PlayCommand implements CommandChain {
   private nextCommand: CommandChain;
@@ -27,9 +26,13 @@ export class PlayCommand implements CommandChain {
   }
 
   private async getInfoAndPlayPlaylist(url: string, musicPlayer: MusicPlayer) {
-    const playlists = await this.ytClient.getPlaylistInfo(url);
-    const urlVideos = playlists.items
-      .filter((item) => item.snippet.description !== 'This video is unavailable.')
+    const playlist = await this.ytClient.getPlaylistInfo(url);
+    const urlVideos = playlist.items
+      .filter(
+        (item) =>
+          item.snippet.description !== 'This video is unavailable.' &&
+          item.snippet.description !== 'This video is private.'
+      )
       .map((item) => `https://www.youtube.com/watch?v=${item.snippet.resourceId.videoId}`);
 
     musicPlayer.playPlaylist(urlVideos);
