@@ -87,7 +87,7 @@ export interface SearchRequest {
 export interface SearchResponse {
   kind: string;
   etag: string;
-  nextPageToken: string;
+  nextPageToken?: string;
   regionCode: string;
   pageinfo: {
     totalResults: number;
@@ -109,7 +109,7 @@ export interface VideoInfoResponse {
 export interface PlaylistInfoResponse {
   kind: string;
   etag: string;
-  nextPageToken: string;
+  nextPageToken?: string;
   items: PlaylistInfoItem[];
   pageinfo: {
     totalResults: number;
