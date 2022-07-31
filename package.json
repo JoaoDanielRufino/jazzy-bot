@@ -30,6 +30,6 @@
     "tiny-typed-emitter": "^2.1.0",
     "tinyduration": "^3.2.2",
     "ts-node": "^10.4.0",
-    "ytdl-core": "^4.10.0"
+    "ytdl-core": "^4.11.0"
   }
 }
